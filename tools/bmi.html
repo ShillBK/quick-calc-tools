@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BMI Calculator – Bengaluru 2026</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">BMI Calculator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-purple-700">Calculate Your BMI</h2>
+      <form id="bmiForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Weight (kg)</label>
+          <input type="number" id="weight" value="65" min="20" step="0.1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" required />
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-lg font-medium mb-2">Height</label>
+            <input type="number" id="heightCm" value="170" min="100" step="0.1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" placeholder="in cm" required />
+          </div>
+          <div class="flex items-end">
+            <select id="heightUnit" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+              <option value="cm">cm (recommended)</option>
+              <option value="ftin">ft/in</option>
+            </select>
+          </div>
+        </div>
+        <div id="ftinInputs" class="grid grid-cols-2 gap-4 hidden">
+          <div>
+            <label class="block text-lg font-medium mb-2">Feet</label>
+            <input type="number" id="feet" min="3" max="7" step="1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" placeholder="e.g. 5" />
+          </div>
+          <div>
+            <label class="block text-lg font-medium mb-2">Inches</label>
+            <input type="number" id="inches" min="0" max="11" step="0.1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" placeholder="e.g. 7" />
+          </div>
+        </div>
+
+        <button type="button" onclick="calculateBMI()" class="w-full bg-purple-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-purple-700 transition">
+          Calculate BMI
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-purple-50 border border-purple-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-purple-800 mb-4">Your BMI Results</h3>
+        <p id="bmiValue" class="text-3xl font-bold mb-3"></p>
+        <p id="category" class="text-xl mb-2"></p>
+        <p id="idealWeight" class="text-lg mb-2"></p>
+        <p class="text-sm text-gray-600 mt-4 italic">
+          Note: For Indian/South Asian adults, use these categories (ICMR/RSSDI guidelines 2026):<br>
+          Underweight: <18.5 | Normal: 18.5–22.9 | Overweight: 23–24.9 | Obese: ≥25<br>
+          Risks (diabetes, heart issues) start earlier than global standards. Consult a doctor for personalized advice.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Toggle ft/in inputs
+    document.getElementById('heightUnit').addEventListener('change', function() {
+      const ftinDiv = document.getElementById('ftinInputs');
+      const heightCm = document.getElementById('heightCm');
+      if (this.value === 'ftin') {
+        ftinDiv.classList.remove('hidden');
+        heightCm.classList.add('hidden');
+      } else {
+        ftinDiv.classList.add('hidden');
+        heightCm.classList.remove('hidden');
+      }
+    });
+
+    function calculateBMI() {
+      let weight = parseFloat(document.getElementById('weight').value);
+      let heightM;
+
+      if (document.getElementById('heightUnit').value === 'cm') {
+        let heightCm = parseFloat(document.getElementById('heightCm').value);
+        heightM = heightCm / 100;
+      } else {
+        let feet = parseFloat(document.getElementById('feet').value) || 0;
+        let inches = parseFloat(document.getElementById('inches').value) || 0;
+        let totalInches = (feet * 12) + inches;
+        heightM = totalInches * 0.0254; // inches to meters
+      }
+
+      if (isNaN(weight) || weight <= 0 || isNaN(heightM) || heightM <= 0) {
+        alert("Please enter valid weight and height.");
+        return;
+      }
+
+      const bmi = weight / (heightM * heightM);
+      let category = '';
+      let colorClass = '';
+
+      if (bmi < 18.5) {
+        category = 'Underweight';
+        colorClass = 'text-yellow-700';
+      } else if (bmi < 23) {
+        category = 'Normal (Healthy range for Indians)';
+        colorClass = 'text-green-700';
+      } else if (bmi < 25) {
+        category = 'Overweight';
+        colorClass = 'text-orange-700';
+      } else {
+        category = 'Obese';
+        colorClass = 'text-red-700';
+      }
+
+      // Ideal weight range (for normal 18.5-22.9)
+      const minIdeal = (18.5 * (heightM * heightM)).toFixed(1);
+      const maxIdeal = (22.9 * (heightM * heightM)).toFixed(1);
+
+      document.getElementById('bmiValue').innerHTML = `Your BMI: <span class="${colorClass}">${bmi.toFixed(2)}</span>`;
+      document.getElementById('category').innerHTML = `<strong>Category:</strong> ${category}`;
+      document.getElementById('idealWeight').innerHTML = `<strong>Ideal weight range for your height:</strong> ${minIdeal} – ${maxIdeal} kg (for BMI 18.5–22.9)`;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru March 2026</p>
+  </footer>
+</body>
+</html>
