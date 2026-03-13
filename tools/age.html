@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Age Calculator – Bengaluru 2026</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Age Calculator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-indigo-700">Calculate Your Age</h2>
+      <form id="ageForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Birth Date</label>
+          <input type="date" id="birthDate" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" required />
+        </div>
+        <button type="button" onclick="calculateAge()" class="w-full bg-indigo-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-indigo-700 transition">
+          Calculate Age
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-indigo-50 border border-indigo-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-indigo-800 mb-4">Your Age Details</h3>
+        <p id="ageYears" class="text-xl mb-2"></p>
+        <p id="ageExact" class="text-xl mb-2"></p>
+        <p id="daysLived" class="text-xl mb-2"></p>
+        <p id="nextBirthday" class="text-xl mb-2"></p>
+        <p class="text-sm text-gray-600 mt-4 italic">
+          Note: Accurate as of March 13, 2026 (Bengaluru time). For fun & reference only — not official age proof. Birth date before today required.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function calculateAge() {
+      const birthInput = document.getElementById('birthDate').value;
+      if (!birthInput) {
+        alert("Please select your birth date.");
+        return;
+      }
+
+      const birthDate = new Date(birthInput);
+      const today = new Date(); // Current date/time (client-side, approx Bengaluru)
+
+      if (birthDate > today) {
+        alert("Birth date cannot be in the future!");
+        return;
+      }
+
+      let years = today.getFullYear() - birthDate.getFullYear();
+      let months = today.getMonth() - birthDate.getMonth();
+      let days = today.getDate() - birthDate.getDate();
+
+      if (days < 0) {
+        months--;
+        const lastMonthDays = new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+        days += lastMonthDays;
+      }
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+
+      // Total days lived (approx)
+      const msPerDay = 1000 * 60 * 60 * 24;
+      const daysLived = Math.floor((today - birthDate) / msPerDay);
+
+      // Days to next birthday
+      let nextBD = new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+      if (nextBD < today) {
+        nextBD.setFullYear(today.getFullYear() + 1);
+      }
+      const daysToBD = Math.ceil((nextBD - today) / msPerDay);
+
+      document.getElementById('ageYears').innerHTML = `<strong>Age:</strong> ${years} years, ${months} months, ${days} days`;
+      document.getElementById('ageExact').innerHTML = `<strong>Exact age:</strong> ${years} years old (as of today)`;
+      document.getElementById('daysLived').innerHTML = `<strong>Total days lived:</strong> ${daysLived.toLocaleString('en-IN')} days`;
+      document.getElementById('nextBirthday').innerHTML = `<strong>Next birthday in:</strong> ${daysToBD} days`;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru March 2026</p>
+  </footer>
+</body>
+</html>
