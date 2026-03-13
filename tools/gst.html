@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GST Calculator – Bengaluru 2026</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">GST Calculator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-green-700">Calculate GST (India 2026)</h2>
+      <form id="gstForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Amount (₹)</label>
+          <input type="number" id="amount" value="1000" min="1" step="0.01" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500" required />
+        </div>
+        <div>
+          <label class="block text-lg font-medium mb-2">GST Rate (%)</label>
+          <select id="rate" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500">
+            <option value="0">0% (Exempt)</option>
+            <option value="5">5%</option>
+            <option value="12">12%</option>
+            <option value="18" selected>18% (Most common)</option>
+            <option value="28">28%</option>
+            <option value="custom">Custom Rate</option>
+          </select>
+          <input type="number" id="customRate" placeholder="Enter custom %" step="0.1" class="w-full p-3 border border-gray-300 rounded-lg mt-2 focus:ring-green-500 focus:border-green-500 hidden" />
+        </div>
+        <div class="flex gap-4">
+          <div class="flex-1">
+            <label class="block text-lg font-medium mb-2">Mode</label>
+            <select id="mode" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500">
+              <option value="exclusive">Exclusive (Add GST to base)</option>
+              <option value="inclusive">Inclusive (Extract GST from total)</option>
+            </select>
+          </div>
+        </div>
+        <button type="button" onclick="calculateGST()" class="w-full bg-green-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-green-700 transition">
+          Calculate GST
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-green-50 border border-green-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-green-800 mb-4">GST Breakdown</h3>
+        <p id="baseAmount" class="text-xl mb-2"></p>
+        <p id="gstAmount" class="text-xl mb-2"></p>
+        <p id="totalAmount" class="text-2xl font-bold mb-2"></p>
+        <p class="text-sm text-gray-600 mt-4 italic">
+          Note: Uses current India GST slabs (2026). 18% common for services/goods. Consult CA for exact classification/tax credits. CalcHub – Free for Bengaluru/India users.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Show/hide custom rate input
+    document.getElementById('rate').addEventListener('change', function() {
+      const customInput = document.getElementById('customRate');
+      if (this.value === 'custom') {
+        customInput.classList.remove('hidden');
+      } else {
+        customInput.classList.add('hidden');
+      }
+    });
+
+    function calculateGST() {
+      const amount = parseFloat(document.getElementById('amount').value);
+      let rate = parseFloat(document.getElementById('rate').value);
+      if (rate === 'custom') {
+        rate = parseFloat(document.getElementById('customRate').value) || 0;
+      }
+      const mode = document.getElementById('mode').value;
+
+      if (isNaN(amount) || amount <= 0 || isNaN(rate) || rate < 0) {
+        alert("Please enter valid amount and GST rate.");
+        return;
+      }
+
+      let base, gst, total;
+
+      if (mode === 'exclusive') {
+        gst = amount * (rate / 100);
+        total = amount + gst;
+        base = amount;
+      } else { // inclusive
+        gst = amount * (rate / (100 + rate));
+        base = amount - gst;
+        total = amount;
+      }
+
+      document.getElementById('baseAmount').innerHTML = `<strong>Base Amount (excl. GST):</strong> ₹${base.toFixed(2).toLocaleString('en-IN')}`;
+      document.getElementById('gstAmount').innerHTML = `<strong>GST Amount (${rate}%):</strong> ₹${gst.toFixed(2).toLocaleString('en-IN')}`;
+      document.getElementById('totalAmount').innerHTML = `<strong>Total Amount (incl. GST):</strong> ₹${total.toFixed(2).toLocaleString('en-IN')}`;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru March 2026</p>
+  </footer>
+</body>
+</html>
