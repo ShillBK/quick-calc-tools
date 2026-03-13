@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mileage / Efficiency Calculator – Bengaluru 2026</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Mileage Calculator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-red-700">Calculate Your Vehicle's Real Mileage</h2>
+      <p class="text-center text-gray-600 mb-6">Enter odometer readings and fuel filled to get accurate km/L or km/kg. Great for Bengaluru traffic & fuel tracking!</p>
+      <form id="mileageForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Previous Odometer Reading (km)</label>
+          <input type="number" id="prevOdo" value="50000" min="0" step="1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500" required />
+        </div>
+        <div>
+          <label class="block text-lg font-medium mb-2">Current Odometer Reading (km)</label>
+          <input type="number" id="currOdo" value="50500" min="0" step="1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500" required />
+        </div>
+        <div>
+          <label class="block text-lg font-medium mb-2">Fuel Filled This Time (L or kg for CNG)</label>
+          <input type="number" id="fuelFilled" value="30" min="0.1" step="0.01" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500" required />
+        </div>
+        <div>
+          <label class="block text-lg font-medium mb-2">Fuel Type</label>
+          <select id="fuelType" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500">
+            <option value="petrol">Petrol</option>
+            <option value="diesel">Diesel</option>
+            <option value="cng">CNG</option>
+          </select>
+        </div>
+        <div class="flex items-center">
+          <input type="checkbox" id="saveFill" class="h-5 w-5 text-red-600" checked />
+          <label for="saveFill" class="ml-3 text-lg">Save this fill for future tracking</label>
+        </div>
+        <button type="button" onclick="calculateMileage()" class="w-full bg-red-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-red-700 transition">
+          Calculate Mileage
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-red-50 border border-red-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-red-800 mb-4">Your Vehicle Efficiency</h3>
+        <p id="mileage" class="text-2xl font-bold mb-3"></p>
+        <p id="distanceDriven" class="text-xl mb-2"></p>
+        <p id="costPerKm" class="text-xl mb-2"></p>
+        <p id="trendNote" class="text-sm text-gray-600 mt-4 italic"></p>
+        <p class="text-sm text-gray-500 mt-2">
+          Note: Real mileage varies with Bengaluru traffic, AC use, driving style. Compare to your vehicle's claimed figure. Data saved locally in browser.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function calculateMileage() {
+      const prevOdo = parseFloat(document.getElementById('prevOdo').value);
+      const currOdo = parseFloat(document.getElementById('currOdo').value);
+      const fuelFilled = parseFloat(document.getElementById('fuelFilled').value);
+      const fuelType = document.getElementById('fuelType').value;
+      const saveFill = document.getElementById('saveFill').checked;
+
+      if (isNaN(prevOdo) || isNaN(currOdo) || currOdo <= prevOdo || isNaN(fuelFilled) || fuelFilled <= 0) {
+        alert("Please enter valid readings: Current odometer > previous, and positive fuel filled.");
+        return;
+      }
+
+      const distance = currOdo - prevOdo;
+      const mileage = distance / fuelFilled;
+      const unit = fuelType === 'cng' ? 'km/kg' : 'km/L';
+
+      // Rough cost per km (using approximate Bengaluru prices March 13, 2026)
+      let pricePerUnit = 102.96; // petrol default
+      if (fuelType === 'diesel') pricePerUnit = 90.99;
+      if (fuelType === 'cng') pricePerUnit = 89.95;
+      const costPerKm = pricePerUnit / mileage;
+
+      document.getElementById('mileage').innerHTML = `Real Mileage: <span class="text-red-700">${mileage.toFixed(2)} ${unit}</span>`;
+      document.getElementById('distanceDriven').innerHTML = `<strong>Distance driven:</strong> ${distance.toLocaleString('en-IN')} km`;
+      document.getElementById('costPerKm').innerHTML = `<strong>Approx cost per km:</strong> ₹${costPerKm.toFixed(2)} (based on current Bengaluru prices)`;
+
+      // Trend note if saved previous fills
+      let trendNote = '';
+      if (saveFill) {
+        const fills = JSON.parse(localStorage.getItem('mileageFills') || '[]');
+        fills.push({ date: new Date().toLocaleDateString('en-IN'), mileage });
+        localStorage.setItem('mileageFills', JSON.stringify(fills.slice(-5))); // keep last 5
+        if (fills.length > 1) {
+          const prevMileage = fills[fills.length - 2].mileage;
+          const diff = mileage - prevMileage;
+          trendNote = diff > 0 
+            ? `Improved by ${diff.toFixed(1)} ${unit} from last fill!` 
+            : `Down by ${Math.abs(diff).toFixed(1)} ${unit} from last fill.`;
+        }
+      }
+      document.getElementById('trendNote').innerHTML = trendNote ? `<strong>Trend:</strong> ${trendNote}` : '';
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru March 2026</p>
+  </footer>
+</body>
+</html>
