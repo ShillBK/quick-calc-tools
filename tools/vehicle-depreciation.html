@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vehicle Depreciation Calculator – India 2026</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Vehicle Depreciation Calculator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-red-700">Estimate Current Vehicle Value (Depreciation)</h2>
+
+      <form id="depForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Original Purchase Price (₹) – Ex-showroom</label>
+          <input type="number" id="purchasePrice" value="1000000" min="100000" step="10000" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Vehicle Age (select slab)</label>
+          <select id="ageSlab" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500">
+            <option value="0.083">Less than 6 months</option>
+            <option value="0.5">6 months to 1 year</option>
+            <option value="1.5">1 to 2 years</option>
+            <option value="2.5">2 to 3 years</option>
+            <option value="3.5" selected>3 to 4 years</option>
+            <option value="4.5">4 to 5 years</option>
+            <option value="5+">More than 5 years (50–60%+ depreciation)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Condition Adjustment (% – optional)</label>
+          <input type="number" id="conditionAdj" value="0" step="5" min="-30" max="30" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500" placeholder="e.g. +10 for excellent, -20 for poor" />
+        </div>
+
+        <button type="button" onclick="calculateDepreciation()" class="w-full bg-red-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-red-700 transition">
+          Calculate Depreciated Value
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-red-50 border border-red-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-red-800 mb-4">Estimated Current Value</h3>
+        <p id="depreciatedValue" class="text-xl mb-3"></p>
+        <p id="depreciationAmount" class="text-xl mb-3"></p>
+        <p id="depreciationPct" class="text-xl"></p>
+      </div>
+
+      <div class="mt-8 text-sm text-gray-600">
+        <p><strong>Basis:</strong> IRDAI standard depreciation slabs for IDV (Insurance Declared Value) in India 2026 – approximate for resale/insurance purposes.</p>
+        <p class="mt-2">Actual value varies by make/model, condition, market, mileage. Use as guide only.</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function calculateDepreciation() {
+      const purchase = parseFloat(document.getElementById('purchasePrice').value);
+      const age = document.getElementById('ageSlab').value;
+      const adj = parseFloat(document.getElementById('conditionAdj').value) || 0;
+
+      if (isNaN(purchase) || purchase < 100000) {
+        alert("Enter valid purchase price (min ₹1,00,000)");
+        return;
+      }
+
+      let depRate;
+      switch(age) {
+        case '0.083': depRate = 5; break;
+        case '0.5': depRate = 15; break;
+        case '1.5': depRate = 20; break;
+        case '2.5': depRate = 30; break;
+        case '3.5': depRate = 40; break;
+        case '4.5': depRate = 50; break;
+        default: depRate = 55; // conservative for >5 years
+      }
+
+      const depAmount = purchase * (depRate / 100);
+      let currentValue = purchase - depAmount;
+
+      // Apply condition adjustment
+      const adjFactor = 1 + (adj / 100);
+      currentValue *= adjFactor;
+
+      currentValue = Math.max(currentValue, purchase * 0.2); // min 20% residual
+
+      document.getElementById('depreciatedValue').innerHTML = `<strong>Estimated Current Value:</strong> ₹${Math.round(currentValue).toLocaleString('en-IN')}`;
+      document.getElementById('depreciationAmount').innerHTML = `<strong>Depreciation Amount:</strong> ₹${Math.round(depAmount).toLocaleString('en-IN')} (+/- condition adj)`;
+      document.getElementById('depreciationPct').innerHTML = `<strong>Depreciation %:</strong> ${depRate}% (IRDAI slab)`;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
