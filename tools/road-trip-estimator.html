@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Road Trip Cost Estimator – India 2026</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Road Trip Cost Estimator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-red-700">Full Road Trip Expense Estimate</h2>
+
+      <form id="tripForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">One-way Distance (km)</label>
+          <input type="number" id="distance" value="250" min="50" step="10" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500" required />
+        </div>
+
+        <div class="flex items-center">
+          <input type="checkbox" id="roundTrip" checked class="h-5 w-5 text-red-600" />
+          <label for="roundTrip" class="ml-3 text-lg font-medium">Round trip (×2 distance)</label>
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Mileage (km/L or km/kg)</label>
+          <input type="number" id="mileage" value="16" min="5" step="0.5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Fuel Type & Price (Bengaluru approx.)</label>
+          <select id="fuelType" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500">
+            <option value="petrol">Petrol (~₹102.92 / L)</option>
+            <option value="diesel">Diesel (~₹90.99 / L)</option>
+            <option value="cng">CNG (~₹90.10 / kg)</option>
+          </select>
+          <input type="number" id="fuelPrice" step="0.01" placeholder="Override price" class="w-full p-3 mt-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500" />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Estimated Tolls & Highway Charges (₹)</label>
+          <input type="number" id="tolls" value="800" min="0" step="100" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500" placeholder="Use TollGuru or FASTag app for exact" />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Other Costs (food, parking, misc – ₹)</label>
+          <input type="number" id="misc" value="2000" min="0" step="500" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500" />
+        </div>
+
+        <button type="button" onclick="calculateTripCost()" class="w-full bg-red-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-red-700 transition">
+          Estimate Total Cost
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-red-50 border border-red-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-red-800 mb-4">Trip Breakdown</h3>
+        <p id="finalDistance" class="text-xl mb-3"></p>
+        <p id="fuelCost" class="text-xl mb-3"></p>
+        <p id="totalCost" class="text-xl mb-3 font-bold"></p>
+        <p id="costPerKm" class="text-xl"></p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function calculateTripCost() {
+      let distance = parseFloat(document.getElementById('distance').value);
+      const isRound = document.getElementById('roundTrip').checked;
+      const mileage = parseFloat(document.getElementById('mileage').value);
+      let price = parseFloat(document.getElementById('fuelPrice').value);
+      const fuelType = document.getElementById('fuelType').value;
+      const tolls = parseFloat(document.getElementById('tolls').value) || 0;
+      const misc = parseFloat(document.getElementById('misc').value) || 0;
+
+      if (isNaN(distance) || distance <= 0 || isNaN(mileage) || mileage <= 0) {
+        alert("Enter valid distance and mileage.");
+        return;
+      }
+
+      if (isRound) distance *= 2;
+
+      // Bengaluru fuel prices March 2026 approx.
+      if (isNaN(price) || price <= 0) {
+        price = fuelType === 'petrol' ? 102.92 : fuelType === 'diesel' ? 90.99 : 90.10;
+      }
+
+      const fuelNeeded = distance / mileage;
+      const fuelCost = fuelNeeded * price;
+      const total = fuelCost + tolls + misc;
+      const perKm = total / distance;
+
+      const unit = fuelType === 'cng' ? 'kg' : 'L';
+
+      document.getElementById('finalDistance').innerHTML = `<strong>Total Distance:</strong> ${distance.toLocaleString('en-IN')} km (${isRound ? 'Round trip' : 'One-way'})`;
+      document.getElementById('fuelCost').innerHTML = `<strong>Fuel Cost:</strong> ₹${Math.round(fuelCost).toLocaleString('en-IN')} (${fuelNeeded.toFixed(2)} ${unit})`;
+      document.getElementById('totalCost').innerHTML = `<strong>Grand Total Estimate:</strong> ₹${Math.round(total).toLocaleString('en-IN')}`;
+      document.getElementById('costPerKm').innerHTML = `<strong>Overall Cost per km:</strong> ₹${perKm.toFixed(2)}`;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
