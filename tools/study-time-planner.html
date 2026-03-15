@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Study Time Planner</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Study Time Planner</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-cyan-700">Plan Your Study Schedule</h2>
+
+      <form id="studyForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Total Study Hours per Day</label>
+          <input type="number" id="hours" value="6" min="1" max="12" step="0.5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Number of Subjects / Topics</label>
+          <input type="number" id="subjects" value="4" min="1" max="10" step="1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Break Time per Hour (minutes)</label>
+          <input type="number" id="breakMin" value="10" min="5" max="20" step="5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" />
+        </div>
+
+        <button type="button" onclick="planStudy()" class="w-full bg-cyan-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-cyan-700 transition">
+          Generate Study Plan
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-cyan-50 border border-cyan-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-cyan-800 mb-4">Suggested Daily Study Schedule</h3>
+        <div id="schedule" class="space-y-3 text-lg"></div>
+        <p class="mt-6 text-sm text-gray-600">Tip: Use Pomodoro (50 min study + 10 min break) or 90-min blocks for best focus.</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function planStudy() {
+      const totalHours = parseFloat(document.getElementById('hours').value);
+      const numSubjects = parseInt(document.getElementById('subjects').value);
+      const breakMin = parseFloat(document.getElementById('breakMin').value);
+
+      if (isNaN(totalHours) || isNaN(numSubjects) || totalHours <= 0 || numSubjects <= 0) {
+        alert("Please enter valid numbers");
+        return;
+      }
+
+      const studyPerSubject = totalHours / numSubjects;
+      const totalBreakTime = (totalHours * 60) / 60 * (breakMin / 60); // breaks per hour
+      const effectiveStudy = totalHours - totalBreakTime;
+
+      let html = `<p class="font-semibold">Total effective study time: ${effectiveStudy.toFixed(1)} hours</p>`;
+      html += `<p class="mt-4">Daily plan suggestion (${numSubjects} subjects):</p><ul class="list-disc pl-6 mt-2 space-y-2">`;
+
+      for (let i = 1; i <= numSubjects; i++) {
+        html += `<li>Subject ${i}: ${studyPerSubject.toFixed(1)} hours + short breaks</li>`;
+      }
+
+      html += `</ul><p class="mt-6 font-medium">Sample schedule:</p>
+        <ul class="list-decimal pl-6 mt-2 space-y-1">
+          <li>8:00 AM – 10:00 AM: Subject 1 (${studyPerSubject.toFixed(1)} h)</li>
+          <li>10:00 AM – 10:15 AM: Break</li>
+          <li>10:15 AM – 12:15 PM: Subject 2</li>
+          <li>... and so on</li>
+        </ul>`;
+
+      document.getElementById('schedule').innerHTML = html;
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
