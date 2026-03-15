@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>House Construction Cost Estimator – Bengaluru 2026</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Construction Cost Estimator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-amber-700">Estimate Total Cost to Build Your House</h2>
+
+      <form id="costForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Built-up Area (sq.ft) – all floors combined</label>
+          <input type="number" id="area" value="2000" min="500" step="100" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Number of Floors (including ground)</label>
+          <input type="number" id="floors" value="2" min="1" max="4" step="1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Construction Quality Level</label>
+          <select id="quality" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500">
+            <option value="economy">Economy / Basic (₹1,800–2,200 / sq.ft)</option>
+            <option value="standard" selected>Standard / Decent (₹2,300–2,800 / sq.ft)</option>
+            <option value="premium">Premium / Luxury (₹3,000–4,000+ / sq.ft)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Extra Features (add % to base cost)</label>
+          <div class="space-y-2">
+            <label class="flex items-center"><input type="checkbox" id="lift" class="h-5 w-5 text-amber-600"> Lift / Elevator (+10–15%)</label>
+            <label class="flex items-center"><input type="checkbox" id="basement" class="h-5 w-5 text-amber-600"> Basement (+20–30%)</label>
+            <label class="flex items-center"><input type="checkbox" id="landscape" class="h-5 w-5 text-amber-600"> Landscaping / Elevation (+5–10%)</label>
+          </div>
+        </div>
+
+        <button type="button" onclick="calculateConstructionCost()" class="w-full bg-amber-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-amber-700 transition">
+          Estimate Total Cost
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-amber-50 border border-amber-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-amber-800 mb-4">Estimated Construction Cost (2026 Bengaluru)</h3>
+        <p id="perSqft" class="text-xl mb-3"></p>
+        <p id="totalCost" class="text-3xl font-bold mb-3"></p>
+        <p id="breakdown" class="text-lg"></p>
+        <p class="mt-4 text-sm text-gray-600">This is a rough estimate only. Actual cost depends on architect fees, material prices, labour rates, permits, site conditions, and inflation. Consult a contractor/architect for accurate quote.</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function calculateConstructionCost() {
+      const area = parseFloat(document.getElementById('area').value);
+      const floors = parseFloat(document.getElementById('floors').value);
+      const quality = document.getElementById('quality').value;
+
+      if (isNaN(area) || isNaN(floors) || area <= 0 || floors <= 0) {
+        alert("Please enter valid area and floors");
+        return;
+      }
+
+      // Base cost per sq.ft (2026 Bengaluru approx – civil + finishing)
+      let baseRate;
+      if (quality === 'economy') baseRate = 2000;
+      else if (quality === 'standard') baseRate = 2550;
+      else baseRate = 3500;
+
+      // Extra for floors (foundation stronger for G+1 and above)
+      const floorFactor = floors > 1 ? 1.1 : 1.0;
+
+      let totalRate = baseRate * floorFactor;
+
+      // Extra features %
+      let extraPct = 0;
+      if (document.getElementById('lift').checked) extraPct += 12;
+      if (document.getElementById('basement').checked) extraPct += 25;
+      if (document.getElementById('landscape').checked) extraPct += 8;
+
+      totalRate *= (1 + extraPct / 100);
+
+      const totalCost = Math.round(area * totalRate);
+
+      document.getElementById('perSqft').innerHTML = `<strong>Estimated Cost per sq.ft:</strong> ₹${Math.round(totalRate).toLocaleString('en-IN')}`;
+      document.getElementById('totalCost').innerHTML = `<strong>Total Estimated Cost:</strong> ₹${totalCost.toLocaleString('en-IN')}`;
+      document.getElementById('breakdown').innerHTML = `• Base civil + finishing: ₹${Math.round(area * baseRate).toLocaleString('en-IN')}<br>• Extras & multi-floor adjustment: +₹${Math.round(totalCost - area * baseRate).toLocaleString('en-IN')}`;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
