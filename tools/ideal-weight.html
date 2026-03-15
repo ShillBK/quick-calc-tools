@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ideal Body Weight Calculator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Ideal Body Weight Calculator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-purple-700">Find Your Ideal Weight Range</h2>
+
+      <form id="weightForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Gender</label>
+          <select id="gender" class="w-full p-3 border border-gray-300 rounded-lg">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Height (cm)</label>
+          <input type="number" id="height" value="170" min="140" step="1" class="w-full p-3 border border-gray-300 rounded-lg" required />
+        </div>
+
+        <button type="button" onclick="calculateIdealWeight()" class="w-full bg-purple-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-purple-700 transition">
+          Calculate Ideal Weight
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-purple-50 border border-purple-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-purple-800 mb-4">Ideal Weight Estimates</h3>
+        <p id="devine" class="text-xl mb-3"></p>
+        <p id="hamwi" class="text-xl mb-3"></p>
+        <p id="robinson" class="text-xl"></p>
+      </div>
+
+      <div class="mt-8 text-sm text-gray-600">
+        <p><strong>Formulas used:</strong> Devine, Hamwi, Robinson (common medical/fitness refs). Aim for mid-range; consult doctor for personalized advice.</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function calculateIdealWeight() {
+      const gender = document.getElementById('gender').value;
+      const heightCm = parseFloat(document.getElementById('height').value);
+      const heightIn = heightCm / 2.54;
+
+      if (isNaN(heightCm) || heightCm < 140) {
+        alert("Enter valid height in cm");
+        return;
+      }
+
+      let devine, hamwi, robinson;
+
+      if (gender === 'male') {
+        devine = 50 + 2.3 * (heightIn - 60);
+        hamwi = 48 + 2.7 * (heightIn - 60);
+        robinson = 52 + 1.9 * (heightIn - 60);
+      } else {
+        devine = 45.5 + 2.3 * (heightIn - 60);
+        hamwi = 45.5 + 2.2 * (heightIn - 60);
+        robinson = 49 + 1.7 * (heightIn - 60);
+      }
+
+      document.getElementById('devine').innerHTML = `<strong>Devine formula:</strong> ${devine.toFixed(1)} kg (range ~±10%)`;
+      document.getElementById('hamwi').innerHTML = `<strong>Hamwi formula:</strong> ${hamwi.toFixed(1)} kg`;
+      document.getElementById('robinson').innerHTML = `<strong>Robinson formula:</strong> ${robinson.toFixed(1)} kg`;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
