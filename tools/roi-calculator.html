@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ROI – Return on Investment Calculator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">ROI Calculator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-teal-700">Calculate Return on Investment</h2>
+
+      <form id="roiForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Initial Investment / Cost (₹)</label>
+          <input type="number" id="cost" value="500000" min="1000" step="1000" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Final Value / Gains Received (₹)</label>
+          <input type="number" id="gain" value="750000" min="0" step="1000" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Time Period (years)</label>
+          <input type="number" id="years" value="3" min="0.1" step="0.1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500" required />
+        </div>
+
+        <button type="button" onclick="calculateROI()" class="w-full bg-teal-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-teal-700 transition">
+          Calculate ROI
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-teal-50 border border-teal-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-teal-800 mb-4">Investment Return Summary</h3>
+        <p id="roiPct" class="text-3xl font-bold mb-4"></p>
+        <p id="netProfit" class="text-xl mb-3"></p>
+        <p id="annualized" class="text-xl"></p>
+        <p id="payback" class="text-lg mt-4"></p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function calculateROI() {
+      const cost = parseFloat(document.getElementById('cost').value);
+      const gain = parseFloat(document.getElementById('gain').value);
+      const years = parseFloat(document.getElementById('years').value);
+
+      if ([cost, gain, years].some(isNaN) || cost <= 0 || years <= 0) {
+        alert("Please enter valid values");
+        return;
+      }
+
+      const profit = gain - cost;
+      const roi = (profit / cost) * 100;
+      const annualized = (Math.pow(gain / cost, 1 / years) - 1) * 100;
+      const payback = cost / (profit / years);
+
+      document.getElementById('roiPct').innerHTML = `${roi.toFixed(2)}% ROI`;
+      document.getElementById('netProfit').innerHTML = `<strong>Net Profit:</strong> ₹${profit.toLocaleString('en-IN')}`;
+      document.getElementById('annualized').innerHTML = `<strong>Annualized Return:</strong> ${annualized.toFixed(2)}% per year`;
+      document.getElementById('payback').innerHTML = `<strong>Payback Period:</strong> ${payback.toFixed(1)} years`;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
