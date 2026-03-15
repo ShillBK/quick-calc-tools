@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Electricity Bill Estimator – Bengaluru 2026</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Electricity Bill Estimator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-amber-700">Estimate Your Monthly Electricity Bill</h2>
+
+      <form id="billForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Monthly Units Consumed (kWh) – from bill</label>
+          <input type="number" id="units" value="250" min="0" step="1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Fixed Charges / Meter Rent (₹) – approx</label>
+          <input type="number" id="fixed" value="100" min="0" step="10" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500" />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Include BESCOM Slab Rates? (Bengaluru 2026 approx.)</label>
+          <select id="slab" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500">
+            <option value="yes">Yes – use domestic LT tariff</option>
+            <option value="no">No – use flat rate</option>
+          </select>
+        </div>
+
+        <button type="button" onclick="estimateBill()" class="w-full bg-amber-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-amber-700 transition">
+          Estimate Monthly Bill
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-amber-50 border border-amber-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-amber-800 mb-4">Estimated Electricity Bill</h3>
+        <p id="energyCharge" class="text-xl mb-3"></p>
+        <p id="totalBill" class="text-2xl font-bold mb-3"></p>
+        <p id="note" class="text-lg"></p>
+      </div>
+
+      <div class="mt-8 text-sm text-gray-600">
+        <p><strong>BESCOM LT domestic tariff (2026 approx.):</strong></p>
+        <ul class="list-disc pl-6 mt-2">
+          <li>0–100 units: ₹4.05/unit</li>
+          <li>101–200: ₹5.90/unit</li>
+          <li>201+: ₹6.85/unit</li>
+          <li>+ fixed charges, taxes, etc.</li>
+        </ul>
+        <p class="mt-4">This is a rough estimate – actual bill includes taxes, fuel adjustment, etc.</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function estimateBill() {
+      const units = parseFloat(document.getElementById('units').value);
+      const fixed = parseFloat(document.getElementById('fixed').value) || 0;
+      const useSlab = document.getElementById('slab').value === 'yes';
+
+      if (isNaN(units) || units < 0) {
+        alert("Enter valid units consumed");
+        return;
+      }
+
+      let energyCost = 0;
+
+      if (useSlab) {
+        // Approximate BESCOM domestic slab 2026
+        if (units <= 100) energyCost = units * 4.05;
+        else if (units <= 200) energyCost = 100 * 4.05 + (units - 100) * 5.90;
+        else energyCost = 100 * 4.05 + 100 * 5.90 + (units - 200) * 6.85;
+      } else {
+        energyCost = units * 6.0; // average flat rate fallback
+      }
+
+      const total = Math.round(energyCost + fixed + (energyCost * 0.05)); // approx tax/others
+
+      document.getElementById('energyCharge').innerHTML = `<strong>Energy Charges:</strong> ₹${Math.round(energyCost).toLocaleString('en-IN')}`;
+      document.getElementById('totalBill').innerHTML = `<strong>Estimated Total Bill:</strong> ₹${total.toLocaleString('en-IN')}`;
+      document.getElementById('note').innerHTML = useSlab ? "Using BESCOM slab rates (approx.)" : "Using average flat rate";
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
