@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Service Interval Reminder Checker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Service Interval Reminder</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-red-700">When is Your Next Car Service Due?</h2>
+
+      <form id="serviceForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Last Service Date</label>
+          <input type="date" id="lastDate" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Odometer at Last Service (km)</label>
+          <input type="number" id="lastOdo" value="15000" min="0" step="100" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Current Odometer Reading (km)</label>
+          <input type="number" id="currentOdo" value="22000" min="0" step="100" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Service Interval (most common in India)</label>
+          <select id="intervalKm" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500">
+            <option value="10000">10,000 km or 12 months (Maruti, Hyundai, Tata standard)</option>
+            <option value="15000">15,000 km or 12 months (some premium brands)</option>
+            <option value="7500">7,500 km or 6 months (older cars / severe conditions)</option>
+          </select>
+        </div>
+
+        <button type="button" onclick="checkServiceDue()" class="w-full bg-red-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-red-700 transition">
+          Check Service Due Date
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden rounded-xl p-6" style="background-color: #fef2f2; border: 1px solid #fecaca;">
+        <h3 class="text-2xl font-bold text-red-800 mb-4">Service Reminder</h3>
+        <p id="status" class="text-xl mb-4 font-medium"></p>
+        <p id="kmLeft" class="text-xl mb-3"></p>
+        <p id="daysLeft" class="text-xl mb-3"></p>
+        <p id="advice" class="text-lg"></p>
+      </div>
+
+      <div class="mt-8 text-sm text-gray-600">
+        <p><strong>Note:</strong> Most Indian brands recommend service every 10,000 km or 12 months (whichever comes first). Severe conditions (Bengaluru traffic, dusty roads) may need earlier service. Always check your owner's manual.</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function checkServiceDue() {
+      const lastDateStr = document.getElementById('lastDate').value;
+      const lastOdo = parseFloat(document.getElementById('lastOdo').value);
+      const currentOdo = parseFloat(document.getElementById('currentOdo').value);
+      const intervalKm = parseFloat(document.getElementById('intervalKm').value);
+
+      if (!lastDateStr || isNaN(lastOdo) || isNaN(currentOdo) || currentOdo < lastOdo) {
+        alert("Please fill all fields correctly. Current odometer must be higher than last service.");
+        return;
+      }
+
+      const lastDate = new Date(lastDateStr);
+      const today = new Date();
+      const intervalMonths = 12;
+
+      // Time-based due date
+      const timeDueDate = new Date(lastDate);
+      timeDueDate.setMonth(timeDueDate.getMonth() + intervalMonths);
+
+      const daysSince = Math.floor((today - lastDate) / (1000 * 60 * 60 * 24));
+      const daysToDue = Math.floor((timeDueDate - today) / (1000 * 60 * 60 * 24));
+
+      // Km-based
+      const kmSince = currentOdo - lastOdo;
+      const kmToDue = intervalKm - kmSince;
+
+      // Which comes first
+      let dueReason = "";
+      let urgencyClass = "text-green-700";
+      let statusText = "Service not due yet";
+
+      if (kmToDue <= 0 || daysToDue <= 0) {
+        statusText = "Service is overdue!";
+        urgencyClass = "text-red-700 font-bold";
+        dueReason = kmToDue <= 0 ? "Exceeded by " + Math.abs(kmToDue) + " km" : "Overdue by " + Math.abs(daysToDue) + " days";
+      } else if (kmToDue < 1000 || daysToDue < 30) {
+        statusText = "Service due soon";
+        urgencyClass = "text-orange-700 font-semibold";
+        dueReason = "Within " + Math.min(kmToDue, 1000) + " km or " + Math.min(daysToDue, 30) + " days";
+      } else {
+        dueReason = kmToDue + " km or " + daysToDue + " days remaining";
+      }
+
+      document.getElementById('status').innerHTML = statusText;
+      document.getElementById('kmLeft').innerHTML = `<strong>Kilometers remaining:</strong> ${kmToDue > 0 ? kmToDue : 'Overdue by ' + Math.abs(kmToDue)} km`;
+      document.getElementById('daysLeft').innerHTML = `<strong>Days remaining:</strong> ${daysToDue > 0 ? daysToDue : 'Overdue by ' + Math.abs(daysToDue)} days`;
+      document.getElementById('advice').innerHTML = `<strong>Recommendation:</strong> ${dueReason}. Book service if close to limit.`;
+
+      const resultDiv = document.getElementById('result');
+      resultDiv.classList.remove('hidden');
+      resultDiv.style.backgroundColor = daysToDue <= 0 || kmToDue <= 0 ? '#fee2e2' : daysToDue <= 30 || kmToDue <= 1000 ? '#fef3c7' : '#f0fdf4';
+      resultDiv.style.borderColor = daysToDue <= 0 || kmToDue <= 0 ? '#fecaca' : daysToDue <= 30 || kmToDue <= 1000 ? '#fde68a' : '#86efac';
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
