@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Marriage Date Predictor – Fun Astrology</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Marriage Date Predictor</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-pink-600">💍 When Will You Get Married? (Fun Prediction)</h2>
+
+      <form id="marriageForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Your Birth Date</label>
+          <input type="date" id="date1" class="w-full p-4 border border-gray-300 rounded-lg text-xl focus:ring-pink-500 focus:border-pink-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Partner's Birth Date</label>
+          <input type="date" id="date2" class="w-full p-4 border border-gray-300 rounded-lg text-xl focus:ring-pink-500 focus:border-pink-500" required />
+        </div>
+
+        <button type="button" onclick="predictMarriage()" class="w-full bg-pink-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-pink-700 transition">
+          Predict Marriage Date
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-pink-50 border border-pink-200 rounded-xl p-8 text-center">
+        <h3 class="text-4xl font-extrabold text-pink-700 mb-6">Predicted Marriage Window</h3>
+        <p class="text-2xl font-bold mb-4" id="window"></p>
+        <p class="text-xl text-gray-800 mb-4" id="reason"></p>
+        <p class="text-lg italic text-gray-600">Just for entertainment – real marriage happens when hearts are ready ❤️</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function predictMarriage() {
+      const d1 = new Date(document.getElementById('date1').value);
+      const d2 = new Date(document.getElementById('date2').value);
+
+      if (isNaN(d1) || isNaN(d2)) {
+        alert("Please enter both valid birth dates");
+        return;
+      }
+
+      const age1 = new Date().getFullYear() - d1.getFullYear();
+      const age2 = new Date().getFullYear() - d2.getFullYear();
+
+      const diffYears = Math.abs(age1 - age2);
+
+      let baseYear = Math.max(age1, age2) + 2; // earliest possible
+      let window = `${new Date().getFullYear() + baseYear - 2026 + 3}-${new Date().getFullYear() + baseYear - 2026 + 6}`;
+
+      let reason = "Auspicious alignment of stars & perfect timing.";
+
+      if (diffYears <= 2) {
+        window = `${new Date().getFullYear() + 1}-${new Date().getFullYear() + 4}`;
+        reason = "Very close ages – strong bond, early marriage likely.";
+      } else if (diffYears > 8) {
+        window = `${new Date().getFullYear() + 4}-${new Date().getFullYear() + 9}`;
+        reason = "Beautiful age gap – maturity brings lasting love.";
+      }
+
+      // Random fun element
+      const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      const luckyMonth = months[Math.floor(Math.random() * 12)];
+
+      document.getElementById('window').textContent = `${luckyMonth} ${window}`;
+      document.getElementById('reason').textContent = reason;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
