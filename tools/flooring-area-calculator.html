@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flooring Area & Quantity Calculator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Flooring Area Calculator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-amber-700">Estimate Flooring Material Needed</h2>
+
+      <form id="floorForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Room Length (ft)</label>
+          <input type="number" id="length" value="15" min="5" step="0.5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Room Width (ft)</label>
+          <input type="number" id="width" value="12" min="5" step="0.5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Waste Factor (%)</label>
+          <input type="number" id="waste" value="10" min="5" max="20" step="1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500" required />
+          <p class="text-sm text-gray-600 mt-1">(10–15% common for tiles due to cutting)</p>
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Tile/Wood Size (sq.ft per piece – optional)</label>
+          <input type="number" id="tileSize" value="9" min="0.5" step="0.1" placeholder="e.g. 2×2 ft = 4, 1×1 ft = 1, leave blank for sq.ft only" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500" />
+        </div>
+
+        <button type="button" onclick="calculateFlooring()" class="w-full bg-amber-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-amber-700 transition">
+          Calculate Flooring Needed
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-amber-50 border border-amber-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-amber-800 mb-4">Flooring Requirement</h3>
+        <p id="baseArea" class="text-xl mb-3"></p>
+        <p id="totalArea" class="text-xl mb-3 font-bold"></p>
+        <p id="pieces" class="text-lg"></p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function calculateFlooring() {
+      const l = parseFloat(document.getElementById('length').value);
+      const w = parseFloat(document.getElementById('width').value);
+      const wastePct = parseFloat(document.getElementById('waste').value) / 100;
+      const tileSqft = parseFloat(document.getElementById('tileSize').value) || 0;
+
+      if (isNaN(l) || isNaN(w) || l <= 0 || w <= 0) {
+        alert("Enter valid length and width");
+        return;
+      }
+
+      const baseArea = l * w;
+      const totalArea = baseArea * (1 + wastePct);
+
+      let resultText = `<strong>Base Floor Area:</strong> ${baseArea.toFixed(2)} sq.ft<br>`;
+      resultText += `<strong>Total Area with Waste:</strong> ${totalArea.toFixed(2)} sq.ft`;
+
+      if (tileSqft > 0) {
+        const pieces = Math.ceil(totalArea / tileSqft);
+        resultText += `<br><strong>Approx. pieces needed:</strong> ${pieces} tiles/boards`;
+      }
+
+      document.getElementById('baseArea').innerHTML = `<strong>Base Floor Area:</strong> ${baseArea.toFixed(2)} sq.ft`;
+      document.getElementById('totalArea').innerHTML = `<strong>Total Material Needed (with waste):</strong> ${totalArea.toFixed(2)} sq.ft`;
+      document.getElementById('pieces').innerHTML = tileSqft > 0 ? `<strong>Approx. tiles/boards (${tileSqft} sq.ft each):</strong> ${Math.ceil(totalArea / tileSqft)}` : '';
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
