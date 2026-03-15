@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Love Calculator – Compatibility %</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Love Calculator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-pink-600">💕 Check Your Love Compatibility</h2>
+
+      <form id="loveForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Your Name</label>
+          <input type="text" id="name1" value="Shilpa" class="w-full p-4 border border-gray-300 rounded-lg text-xl focus:ring-pink-500 focus:border-pink-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Partner's Name / Crush Name</label>
+          <input type="text" id="name2" value="Rahul" class="w-full p-4 border border-gray-300 rounded-lg text-xl focus:ring-pink-500 focus:border-pink-500" required />
+        </div>
+
+        <button type="button" onclick="calculateLove()" class="w-full bg-pink-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-pink-700 transition">
+          Calculate Love % ❤️
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-pink-50 border border-pink-200 rounded-xl p-8 text-center">
+        <h3 class="text-4xl font-bold text-pink-700 mb-6" id="percentage"></h3>
+        <p class="text-2xl font-medium text-gray-800 mb-4" id="message"></p>
+        <p class="text-lg text-gray-600 italic" id="funText"></p>
+      </div>
+
+      <div class="mt-10 text-center text-sm text-gray-500">
+        <p>Just for fun! ❤️ This is an entertaining compatibility checker, not real science.</p>
+        <p>Results are randomized with some name-based logic – enjoy responsibly 😊</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function calculateLove() {
+      const name1 = document.getElementById('name1').value.trim().toLowerCase();
+      const name2 = document.getElementById('name2').value.trim().toLowerCase();
+
+      if (!name1 || !name2) {
+        alert("Please enter both names!");
+        return;
+      }
+
+      // Simple fun hash: sum of char codes + some randomness
+      let score = 0;
+      for (let char of name1 + name2) {
+        score += char.charCodeAt(0);
+      }
+      score = (score % 101) + Math.floor(Math.random() * 30) - 15; // range ~0-130, centered around 50-80
+      score = Math.max(0, Math.min(100, Math.round(score)));
+
+      let message = "";
+      let funText = "";
+
+      if (score >= 90) {
+        message = "Perfect Match! 💖💖💖";
+        funText = "You two are soulmates – go confess today!";
+      } else if (score >= 75) {
+        message = "Strong Chemistry 🔥";
+        funText = "High chance of sparks – take the next step!";
+      } else if (score >= 50) {
+        message = "Good Potential ❤️";
+        funText = "There's definitely something here – give it time.";
+      } else if (score >= 30) {
+        message = "Just Friends Zone 😅";
+        funText = "Friendship first – maybe more later?";
+      } else {
+        message = "Better as Friends 👫";
+        funText = "No romantic vibes – but great buddy material!";
+      }
+
+      document.getElementById('percentage').textContent = `${score}%`;
+      document.getElementById('message').textContent = message;
+      document.getElementById('funText').textContent = funText;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
