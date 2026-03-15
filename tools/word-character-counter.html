@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Word & Character Counter</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Word / Character Counter</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-gray-700">Count Words, Characters & More</h2>
+
+      <textarea id="textInput" rows="10" class="w-full p-4 border border-gray-300 rounded-lg text-lg focus:ring-gray-500 focus:border-gray-500" placeholder="Paste or type your text here..."></textarea>
+
+      <button onclick="countText()" class="w-full mt-6 bg-gray-700 text-white py-4 rounded-lg text-xl font-bold hover:bg-gray-800 transition">
+        Count Now
+      </button>
+
+      <div id="result" class="mt-10 hidden bg-gray-100 border border-gray-300 rounded-xl p-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div>
+            <p class="text-4xl font-extrabold text-gray-800" id="words">0</p>
+            <p class="text-lg font-medium">Words</p>
+          </div>
+          <div>
+            <p class="text-4xl font-extrabold text-gray-800" id="chars">0</p>
+            <p class="text-lg font-medium">Characters</p>
+          </div>
+          <div>
+            <p class="text-4xl font-extrabold text-gray-800" id="charsNoSpace">0</p>
+            <p class="text-lg font-medium">Chars (no spaces)</p>
+          </div>
+          <div>
+            <p class="text-4xl font-extrabold text-gray-800" id="sentences">0</p>
+            <p class="text-lg font-medium">Sentences</p>
+          </div>
+        </div>
+        <div class="mt-8 text-center">
+          <p class="text-xl" id="paragraphs">0 paragraphs</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function countText() {
+      const text = document.getElementById('textInput').value.trim();
+
+      if (!text) {
+        alert("Please enter some text");
+        return;
+      }
+
+      const words = text.split(/\s+/).filter(w => w.length > 0).length;
+      const chars = text.length;
+      const charsNoSpace = text.replace(/\s+/g, '').length;
+      const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
+      const paragraphs = text.split(/\n+/).filter(p => p.trim().length > 0).length;
+
+      document.getElementById('words').textContent = words.toLocaleString('en-IN');
+      document.getElementById('chars').textContent = chars.toLocaleString('en-IN');
+      document.getElementById('charsNoSpace').textContent = charsNoSpace.toLocaleString('en-IN');
+      document.getElementById('sentences').textContent = sentences.toLocaleString('en-IN');
+      document.getElementById('paragraphs').textContent = `${paragraphs} paragraph${paragraphs !== 1 ? 's' : ''}`;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
