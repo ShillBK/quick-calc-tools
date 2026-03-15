@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tyre Pressure Converter – PSI, Bar, kPa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Tyre Pressure Converter</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-red-700">Convert Tyre Pressure Units</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Input Section -->
+        <div>
+          <label class="block text-lg font-medium mb-3">Enter Pressure Value</label>
+          <input type="number" id="value" value="32" min="0" step="0.1" class="w-full p-4 border border-gray-300 rounded-lg text-2xl focus:ring-red-500 focus:border-red-500" required />
+
+          <label class="block text-lg font-medium mt-6 mb-3">From Unit</label>
+          <select id="fromUnit" class="w-full p-4 border border-gray-300 rounded-lg text-xl focus:ring-red-500 focus:border-red-500">
+            <option value="psi">PSI (most common in India)</option>
+            <option value="bar">Bar</option>
+            <option value="kpa">kPa</option>
+            <option value="kgcm2">kg/cm²</option>
+          </select>
+
+          <button onclick="convertPressure()" class="w-full mt-8 bg-red-600 text-white py-4 rounded-lg text-xl font-bold hover:bg-red-700 transition">
+            Convert
+          </button>
+        </div>
+
+        <!-- Results Section -->
+        <div id="result" class="hidden bg-red-50 border border-red-200 rounded-xl p-6">
+          <h3 class="text-2xl font-bold text-red-800 mb-6">Converted Values</h3>
+          <div class="space-y-4 text-xl">
+            <p><strong>PSI:</strong> <span id="psi"></span></p>
+            <p><strong>Bar:</strong> <span id="bar"></span></p>
+            <p><strong>kPa:</strong> <span id="kpa"></span></p>
+            <p><strong>kg/cm²:</strong> <span id="kgcm2"></span></p>
+          </div>
+
+          <div class="mt-8 pt-6 border-t border-red-200">
+            <p class="text-lg font-medium">Typical Recommendations (Passenger Cars in India):</p>
+            <ul class="list-disc pl-6 mt-2 text-base">
+              <li>Hatchback/Sedan: 32–35 PSI front & rear</li>
+              <li>SUV/Crossover: 33–38 PSI</li>
+              <li>Bikes/Scooters: 28–36 PSI front, 32–42 PSI rear</li>
+            </ul>
+            <p class="mt-4 text-sm">Check your vehicle door sticker or manual for exact recommended pressure.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function convertPressure() {
+      const value = parseFloat(document.getElementById('value').value);
+      const fromUnit = document.getElementById('fromUnit').value;
+
+      if (isNaN(value) || value <= 0) {
+        alert("Please enter a valid positive pressure value");
+        return;
+      }
+
+      // Conversion factors to PSI (base unit)
+      const toPsi = {
+        psi: 1,
+        bar: 14.5038,
+        kpa: 0.145038,
+        kgcm2: 14.2233
+      };
+
+      const psi = value * toPsi[fromUnit];
+
+      document.getElementById('psi').textContent = psi.toFixed(1) + " PSI";
+      document.getElementById('bar').textContent = (psi / 14.5038).toFixed(2) + " Bar";
+      document.getElementById('kpa').textContent = (psi / 0.145038).toFixed(0) + " kPa";
+      document.getElementById('kgcm2').textContent = (psi / 14.2233).toFixed(2) + " kg/cm²";
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
