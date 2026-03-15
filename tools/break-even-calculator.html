@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Break-even Calculator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Break-even Calculator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-teal-700">How Many Units to Break Even?</h2>
+
+      <form id="breakEvenForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Fixed Costs (₹) – rent, salary, software etc.</label>
+          <input type="number" id="fixed" value="300000" min="0" step="1000" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Variable Cost per Unit (₹) – material, delivery, commission</label>
+          <input type="number" id="variable" value="400" min="0" step="10" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Selling Price per Unit (₹)</label>
+          <input type="number" id="price" value="800" min="1" step="10" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500" required />
+        </div>
+
+        <button type="button" onclick="calculateBreakEven()" class="w-full bg-teal-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-teal-700 transition">
+          Calculate Break-even Point
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-teal-50 border border-teal-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-teal-800 mb-4">Break-even Analysis</h3>
+        <p id="units" class="text-3xl font-bold mb-4"></p>
+        <p id="revenue" class="text-xl mb-3"></p>
+        <p id="margin" class="text-xl"></p>
+      </div>
+
+      <div class="mt-8 text-sm text-gray-600">
+        <p><strong>Formulas:</strong></p>
+        <ul class="list-disc pl-6 mt-2">
+          <li>Contribution Margin per Unit = Selling Price - Variable Cost</li>
+          <li>Break-even Units = Fixed Costs / Contribution Margin per Unit</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function calculateBreakEven() {
+      const fixed = parseFloat(document.getElementById('fixed').value);
+      const variable = parseFloat(document.getElementById('variable').value);
+      const price = parseFloat(document.getElementById('price').value);
+
+      if ([fixed, variable, price].some(isNaN) || fixed < 0 || variable < 0 || price <= variable) {
+        alert("Please check values: Price must be > Variable Cost");
+        return;
+      }
+
+      const contribution = price - variable;
+      const units = Math.ceil(fixed / contribution);
+      const revenue = units * price;
+
+      document.getElementById('units').innerHTML = `You need to sell <span class="text-teal-700">${units.toLocaleString('en-IN')}</span> units to break even`;
+      document.getElementById('revenue').innerHTML = `<strong>Break-even Revenue:</strong> ₹${revenue.toLocaleString('en-IN')}`;
+      document.getElementById('margin').innerHTML = `<strong>Contribution Margin per Unit:</strong> ₹${contribution.toFixed(2)}`;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
