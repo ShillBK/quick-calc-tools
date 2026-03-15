@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Life Path Number Calculator – Numerology</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Life Path Number (Numerology)</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-indigo-700">🔮 Find Your Life Path Number</h2>
+
+      <form id="numForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Birth Date</label>
+          <input type="date" id="birthdate" class="w-full p-4 border border-gray-300 rounded-lg text-xl focus:ring-indigo-500 focus:border-indigo-500" required />
+        </div>
+
+        <button type="button" onclick="calculateLifePath()" class="w-full bg-indigo-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-indigo-700 transition">
+          Calculate Life Path
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-indigo-50 border border-indigo-200 rounded-xl p-8 text-center">
+        <h3 class="text-5xl font-extrabold text-indigo-700 mb-6" id="number"></h3>
+        <p class="text-2xl font-medium text-gray-800 mb-4" id="title"></p>
+        <p class="text-lg text-gray-700 leading-relaxed" id="desc"></p>
+      </div>
+
+      <div class="mt-8 text-sm text-gray-600 text-center">
+        <p>Life Path Number = sum of birth date digits reduced to single digit (except master numbers 11, 22, 33)</p>
+        <p class="mt-2">For entertainment & self-reflection only – not scientific.</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function calculateLifePath() {
+      const dateStr = document.getElementById('birthdate').value;
+      if (!dateStr) {
+        alert("Please select your birth date");
+        return;
+      }
+
+      const date = new Date(dateStr);
+      const day = date.getDate();
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+
+      let sum = day + month + year;
+
+      // Reduce to single digit or master number
+      function reduce(n) {
+        if ([11,22,33].includes(n)) return n;
+        while (n > 9) {
+          n = String(n).split('').reduce((a,b)=>a+Number(b),0);
+        }
+        return n;
+      }
+
+      let lifePath = reduce(sum);
+
+      const meanings = {
+        1: {t:"Leader & Pioneer", d:"Independent, ambitious, original thinker. You are here to lead and create your own path."},
+        2: {t:"Diplomat & Peacemaker", d:"Sensitive, cooperative, intuitive. You thrive in partnerships and harmony."},
+        3: {t:"Creative & Expressive", d:"Joyful, social, artistic. You bring light and inspiration to others."},
+        4: {t:"Builder & Organizer", d:"Practical, disciplined, hardworking. You create stable foundations."},
+        5: {t:"Adventurer & Freedom Seeker", d:"Curious, adaptable, energetic. You love change and variety."},
+        6: {t:"Nurturer & Healer", d:"Responsible, loving, harmonious. You care deeply for family & community."},
+        7: {t:"Seeker & Thinker", d:"Introspective, analytical, spiritual. You search for deeper truths."},
+        8: {t:"Achiever & Powerhouse", d:"Ambitious, authoritative, material success. You master abundance."},
+        9: {t:"Humanitarian & Compassionate", d:"Generous, idealistic, wise. You serve the greater good."},
+        11: {t:"Master Intuitive / Inspirer", d:"Visionary, highly sensitive, enlightened teacher."},
+        22: {t:"Master Builder", d:"Practical visionary – turns big dreams into reality."},
+        33: {t:"Master Teacher / Healer", d:"Ultimate compassion and spiritual service."}
+      };
+
+      const info = meanings[lifePath] || {t:"Unique Path", d:"Your number carries special energy – explore further!"};
+
+      document.getElementById('number').textContent = lifePath;
+      document.getElementById('title').textContent = info.t;
+      document.getElementById('desc').textContent = info.d;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
