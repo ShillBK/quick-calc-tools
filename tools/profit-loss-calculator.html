@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profit & Loss Calculator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Profit & Loss Calculator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-green-700">Calculate Profit or Loss</h2>
+
+      <form id="plForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Cost Price / Purchase Price (₹)</label>
+          <input type="number" id="cp" value="5000" min="0.01" step="0.01" class="w-full p-4 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Selling Price (₹)</label>
+          <input type="number" id="sp" value="6500" min="0.01" step="0.01" class="w-full p-4 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Quantity (optional – default 1)</label>
+          <input type="number" id="qty" value="1" min="1" step="1" class="w-full p-4 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500" />
+        </div>
+
+        <button type="button" onclick="calculatePL()" class="w-full bg-green-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-green-700 transition">
+          Calculate Profit / Loss
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden rounded-xl p-6" style="background-color: #f0fdf4; border: 1px solid #86efac;">
+        <h3 class="text-2xl font-bold text-green-800 mb-4">Results</h3>
+        <p id="status" class="text-2xl font-bold mb-4"></p>
+        <p id="amount" class="text-xl mb-3"></p>
+        <p id="percentage" class="text-xl mb-3"></p>
+        <p id="perUnit" class="text-lg"></p>
+      </div>
+
+      <div class="mt-8 text-sm text-gray-600">
+        <p><strong>Formulas:</strong></p>
+        <ul class="list-disc pl-6 mt-2">
+          <li>Profit/Loss Amount = (Selling Price - Cost Price) × Quantity</li>
+          <li>Profit/Loss % = (Profit/Loss Amount / Total Cost Price) × 100</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function calculatePL() {
+      const cp = parseFloat(document.getElementById('cp').value);
+      const sp = parseFloat(document.getElementById('sp').value);
+      const qty = parseFloat(document.getElementById('qty').value) || 1;
+
+      if (isNaN(cp) || isNaN(sp) || cp <= 0 || sp <= 0 || qty <= 0) {
+        alert("Please enter valid positive values");
+        return;
+      }
+
+      const totalCP = cp * qty;
+      const totalSP = sp * qty;
+      const diff = totalSP - totalCP;
+      const pct = (diff / totalCP) * 100;
+
+      let status = diff > 0 ? "Profit" : diff < 0 ? "Loss" : "Break-even";
+      let color = diff > 0 ? "text-green-700" : diff < 0 ? "text-red-700" : "text-gray-700";
+
+      document.getElementById('status').innerHTML = `${status}: ${Math.abs(diff).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})} ₹`;
+      document.getElementById('status').className = `text-2xl font-bold mb-4 ${color}`;
+      document.getElementById('amount').innerHTML = `<strong>Total ${status} Amount:</strong> ${diff.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})} ₹`;
+      document.getElementById('percentage').innerHTML = `<strong>${status} Percentage:</strong> ${pct.toFixed(2)}%`;
+      document.getElementById('perUnit').innerHTML = `<strong>Per unit ${status.toLowerCase()}:</strong> ${(diff / qty).toFixed(2)} ₹`;
+
+      const resultDiv = document.getElementById('result');
+      resultDiv.classList.remove('hidden');
+      resultDiv.style.backgroundColor = diff > 0 ? '#f0fdf4' : diff < 0 ? '#fee2e2' : '#f3f4f6';
+      resultDiv.style.borderColor = diff > 0 ? '#86efac' : diff < 0 ? '#fecaca' : '#d1d5db';
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
