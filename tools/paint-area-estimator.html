@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Paint Area & Quantity Estimator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Paint Area Estimator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-amber-700">Estimate Paint Needed for Your Room</h2>
+
+      <form id="paintForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Room Length (ft)</label>
+          <input type="number" id="length" value="12" min="5" step="0.5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Room Width (ft)</label>
+          <input type="number" id="width" value="10" min="5" step="0.5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Room Height (ft)</label>
+          <input type="number" id="height" value="10" min="8" step="0.5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Number of Doors (approx)</label>
+          <input type="number" id="doors" value="1" min="0" step="1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500" />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Number of Windows (approx)</label>
+          <input type="number" id="windows" value="2" min="0" step="1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500" />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Coats of Paint</label>
+          <select id="coats" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500">
+            <option value="2">2 coats (standard)</option>
+            <option value="3">3 coats (new wall / dark to light)</option>
+          </select>
+        </div>
+
+        <button type="button" onclick="calculatePaint()" class="w-full bg-amber-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-amber-700 transition">
+          Calculate Paint Quantity
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-amber-50 border border-amber-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-amber-800 mb-4">Paint Requirement Estimate</h3>
+        <p id="wallArea" class="text-xl mb-3"></p>
+        <p id="paintLitres" class="text-xl mb-3 font-bold"></p>
+        <p id="paintCans" class="text-lg"></p>
+      </div>
+
+      <div class="mt-8 text-sm text-gray-600">
+        <p><strong>Assumptions:</strong> 1 litre covers ~100–120 sq.ft per coat (Asian Paints / Berger standard). Doors ~20 sq.ft each, windows ~15 sq.ft each. Ceiling not included. Actual coverage varies by brand, surface, color.</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function calculatePaint() {
+      const l = parseFloat(document.getElementById('length').value);
+      const w = parseFloat(document.getElementById('width').value);
+      const h = parseFloat(document.getElementById('height').value);
+      const doors = parseFloat(document.getElementById('doors').value) || 0;
+      const windows = parseFloat(document.getElementById('windows').value) || 0;
+      const coats = parseFloat(document.getElementById('coats').value);
+
+      if ([l,w,h].some(isNaN) || l <= 0 || w <= 0 || h <= 0) {
+        alert("Enter valid room dimensions");
+        return;
+      }
+
+      const perimeter = 2 * (l + w);
+      const wallArea = perimeter * h;
+      const doorWindowArea = (doors * 20) + (windows * 15);
+      const netWallArea = wallArea - doorWindowArea;
+      const totalArea = netWallArea * coats;
+
+      // Coverage ~110 sq.ft / litre per coat
+      const litres = totalArea / 110;
+      const cans = Math.ceil(litres / 4); // assuming 4L cans common
+
+      document.getElementById('wallArea').innerHTML = `<strong>Net Wall Area (after doors/windows):</strong> ${Math.round(netWallArea)} sq.ft`;
+      document.getElementById('paintLitres').innerHTML = `<strong>Total Paint Needed:</strong> ${litres.toFixed(1)} litres (${coats} coats)`;
+      document.getElementById('paintCans').innerHTML = `<strong>Approx. 4L cans required:</strong> ${cans} cans (round up for safety)`;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
