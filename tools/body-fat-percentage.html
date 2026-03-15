@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Body Fat Percentage Calculator – US Navy Method</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Body Fat Percentage Calculator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-purple-700">Estimate Body Fat % (US Navy Method)</h2>
+
+      <form id="bfForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Gender</label>
+          <select id="gender" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Height (cm)</label>
+          <input type="number" id="height" value="170" min="140" step="1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Neck Circumference (cm) – at Adam's apple level</label>
+          <input type="number" id="neck" value="38" min="20" step="0.5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Waist Circumference (cm) – at navel / narrowest point</label>
+          <input type="number" id="waist" value="85" min="50" step="0.5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" required />
+        </div>
+
+        <div id="hipDiv" class="hidden">
+          <label class="block text-lg font-medium mb-2">Hip Circumference (cm) – widest point (women only)</label>
+          <input type="number" id="hip" value="95" min="60" step="0.5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" />
+        </div>
+
+        <button type="button" onclick="calculateBodyFat()" class="w-full bg-purple-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-purple-700 transition">
+          Calculate Body Fat %
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-purple-50 border border-purple-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-purple-800 mb-4">Your Estimated Body Fat</h3>
+        <p id="bfPercent" class="text-xl mb-3 font-bold"></p>
+        <p id="category" class="text-xl mb-3"></p>
+        <p id="note" class="text-lg"></p>
+      </div>
+
+      <div class="mt-8 text-sm text-gray-600">
+        <p><strong>Method:</strong> US Navy circumference formula (±3–4% accuracy). Measure with tape snug but not tight. For women, hip measurement required.</p>
+        <p class="mt-2">Categories approximate (varies by age/fitness): Men <15% athletic, 15–20% fit, >25% higher; Women <22% athletic, 22–30% fit, >35% higher. Consult professional for precise (e.g., DEXA).</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Show/hide hip field for women
+    document.getElementById('gender').addEventListener('change', function() {
+      document.getElementById('hipDiv').classList.toggle('hidden', this.value !== 'female');
+    });
+
+    function calculateBodyFat() {
+      const gender = document.getElementById('gender').value;
+      const heightCm = parseFloat(document.getElementById('height').value);
+      const neckCm = parseFloat(document.getElementById('neck').value);
+      const waistCm = parseFloat(document.getElementById('waist').value);
+      const hipCm = gender === 'female' ? parseFloat(document.getElementById('hip').value) : 0;
+
+      if ([heightCm, neckCm, waistCm].some(isNaN) || heightCm < 140 || neckCm < 20 || waistCm < 50) {
+        alert("Enter valid measurements in cm");
+        return;
+      }
+
+      if (gender === 'female' && (isNaN(hipCm) || hipCm < 60)) {
+        alert("Enter valid hip measurement for women");
+        return;
+      }
+
+      // Convert to inches (Navy formula uses inches)
+      const heightIn = heightCm / 2.54;
+      const neckIn = neckCm / 2.54;
+      const waistIn = waistCm / 2.54;
+      const hipIn = hipCm / 2.54;
+
+      let bfPercent;
+
+      if (gender === 'male') {
+        bfPercent = 86.010 * Math.log10(waistIn - neckIn) - 70.041 * Math.log10(heightIn) + 36.76;
+      } else {
+        bfPercent = 163.205 * Math.log10(waistIn + hipIn - neckIn) - 97.684 * Math.log10(heightIn) - 78.387;
+      }
+
+      bfPercent = Math.round(bfPercent * 10) / 10; // 1 decimal
+
+      let category = '';
+      if (gender === 'male') {
+        if (bfPercent < 10) category = 'Very low / Athletic';
+        else if (bfPercent < 15) category = 'Athletic';
+        else if (bfPercent < 20) category = 'Fit';
+        else if (bfPercent < 25) category = 'Average';
+        else category = 'Higher – consider lifestyle changes';
+      } else {
+        if (bfPercent < 18) category = 'Very low / Athletic';
+        else if (bfPercent < 23) category = 'Athletic';
+        else if (bfPercent < 30) category = 'Fit';
+        else if (bfPercent < 35) category = 'Average';
+        else category = 'Higher – consider lifestyle changes';
+      }
+
+      document.getElementById('bfPercent').innerHTML = `<strong>Body Fat Percentage:</strong> ${bfPercent}%`;
+      document.getElementById('category').innerHTML = `<strong>Category:</strong> ${category}`;
+      document.getElementById('note').innerHTML = `<strong>Note:</strong> This is an estimate using US Navy method. For best accuracy, measure consistently (morning, fasted).`;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
