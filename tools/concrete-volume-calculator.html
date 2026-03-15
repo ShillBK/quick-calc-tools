@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Concrete Volume & Material Calculator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Concrete Volume Calculator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-amber-700">Estimate Concrete & Raw Materials</h2>
+
+      <form id="concreteForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Concrete Grade</label>
+          <select id="grade" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500">
+            <option value="m20">M20 (1:1.5:3) – most residential slabs/columns</option>
+            <option value="m25">M25 (1:1:2) – stronger</option>
+            <option value="m15">M15 (1:2:4) – PCC/base</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Length (ft)</label>
+          <input type="number" id="length" value="20" min="1" step="0.5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Width (ft)</label>
+          <input type="number" id="width" value="15" min="1" step="0.5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Thickness / Depth (inches) – slab: 4–6, footing: 12–24</label>
+          <input type="number" id="thickness" value="5" min="1" step="0.5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500" required />
+        </div>
+
+        <button type="button" onclick="calculateConcrete()" class="w-full bg-amber-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-amber-700 transition">
+          Calculate Concrete & Materials
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-amber-50 border border-amber-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-amber-800 mb-4">Concrete Requirement</h3>
+        <p id="volume" class="text-xl mb-3"></p>
+        <p id="cement" class="text-xl mb-3"></p>
+        <p id="sand" class="text-xl mb-3"></p>
+        <p id="aggregate" class="text-xl"></p>
+      </div>
+
+      <div class="mt-8 text-sm text-gray-600">
+        <p><strong>Note:</strong> M20 mix = 1:1.5:3 (cement:sand:aggregate by volume). 1 bag cement = 50 kg ≈ 1.25 cft. Actual consumption varies ±5–10% with wastage, compaction, water-cement ratio. Use for estimation only.</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function calculateConcrete() {
+      const grade = document.getElementById('grade').value;
+      const l = parseFloat(document.getElementById('length').value);
+      const w = parseFloat(document.getElementById('width').value);
+      const t = parseFloat(document.getElementById('thickness').value);
+
+      if ([l,w,t].some(isNaN) || l <= 0 || w <= 0 || t <= 0) {
+        alert("Enter valid dimensions");
+        return;
+      }
+
+      // Convert to feet → cubic feet
+      const volumeCft = l * w * (t / 12);
+
+      // Convert to cubic meter (1 cft = 0.0283168 m³)
+      const volumeM3 = volumeCft * 0.0283168;
+
+      // M20 = 1:1.5:3 → total parts = 5.5
+      // Cement = 1/5.5 × volumeM3 × 1440 kg/m³ (cement density) / 50 kg/bag
+      let cementBags, sandCft, aggCft;
+
+      if (grade === 'm20') {
+        cementBags = Math.ceil((volumeM3 * 8.0)); // ~8 bags per m³ M20
+        sandCft = volumeCft * (1.5 / 5.5);
+        aggCft = volumeCft * (3 / 5.5);
+      } else if (grade === 'm25') {
+        cementBags = Math.ceil(volumeM3 * 9.0);
+        sandCft = volumeCft * (1 / 5);
+        aggCft = volumeCft * (2 / 5);
+      } else { // m15
+        cementBags = Math.ceil(volumeM3 * 6.5);
+        sandCft = volumeCft * (2 / 7);
+        aggCft = volumeCft * (4 / 7);
+      }
+
+      document.getElementById('volume').innerHTML = `<strong>Concrete Volume:</strong> ${volumeCft.toFixed(2)} cft / ${volumeM3.toFixed(2)} m³`;
+      document.getElementById('cement').innerHTML = `<strong>Cement:</strong> ${cementBags} bags (50 kg each)`;
+      document.getElementById('sand').innerHTML = `<strong>Sand:</strong> ${sandCft.toFixed(1)} cft`;
+      document.getElementById('aggregate').innerHTML = `<strong>Aggregate (20mm):</strong> ${aggCft.toFixed(1)} cft`;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
