@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tip Calculator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Tip Calculator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-gray-700">Calculate Tip & Split Bill</h2>
+
+      <form id="tipForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Bill Amount (₹)</label>
+          <input type="number" id="bill" value="1200" min="0" step="10" class="w-full p-4 border border-gray-300 rounded-lg text-2xl focus:ring-gray-500 focus:border-gray-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Tip Percentage (%)</label>
+          <input type="number" id="tipPct" value="15" min="0" max="50" step="1" class="w-full p-4 border border-gray-300 rounded-lg focus:ring-gray-500 focus:border-gray-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Number of People</label>
+          <input type="number" id="people" value="2" min="1" step="1" class="w-full p-4 border border-gray-300 rounded-lg focus:ring-gray-500 focus:border-gray-500" required />
+        </div>
+
+        <button type="button" onclick="calculateTip()" class="w-full bg-gray-700 text-white py-4 rounded-lg text-xl font-bold hover:bg-gray-800 transition">
+          Calculate Tip & Split
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-gray-100 border border-gray-300 rounded-xl p-8">
+        <div class="grid grid-cols-2 gap-6 text-center text-lg">
+          <div>
+            <p class="font-medium">Tip Amount:</p>
+            <p id="tipAmt" class="text-3xl font-bold text-gray-800"></p>
+          </div>
+          <div>
+            <p class="font-medium">Total Amount:</p>
+            <p id="totalAmt" class="text-3xl font-bold text-gray-800"></p>
+          </div>
+          <div class="col-span-2 mt-4">
+            <p class="font-medium">Each Person Pays:</p>
+            <p id="perPerson" class="text-4xl font-extrabold text-teal-700"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function calculateTip() {
+      const bill = parseFloat(document.getElementById('bill').value);
+      const tipPct = parseFloat(document.getElementById('tipPct').value) / 100;
+      const people = parseInt(document.getElementById('people').value);
+
+      if (isNaN(bill) || isNaN(tipPct) || isNaN(people) || bill <= 0 || people <= 0) {
+        alert("Please enter valid positive values");
+        return;
+      }
+
+      const tip = bill * tipPct;
+      const total = bill + tip;
+      const perPerson = total / people;
+
+      document.getElementById('tipAmt').textContent = `₹${tip.toFixed(2)}`;
+      document.getElementById('totalAmt').textContent = `₹${total.toFixed(2)}`;
+      document.getElementById('perPerson').textContent = `₹${perPerson.toFixed(2)}`;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
