@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Brickwork / Blockwork Calculator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Brickwork / Blockwork Calculator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-amber-700">Estimate Bricks / Blocks & Mortar</h2>
+
+      <form id="brickForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Wall Length (ft)</label>
+          <input type="number" id="length" value="30" min="1" step="0.5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Wall Height (ft)</label>
+          <input type="number" id="height" value="10" min="3" step="0.5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Wall Thickness</label>
+          <select id="thickness" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500">
+            <option value="0.375">4.5 inch (single brick wall)</option>
+            <option value="0.75" selected>9 inch (double brick wall – most common)</option>
+            <option value="0.5">6 inch (block wall)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Material Type</label>
+          <select id="material" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500">
+            <option value="brick">Red Clay Brick (9" × 4.5" × 3")</option>
+            <option value="block">Concrete Block (8" × 8" × 12")</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Add Wastage (%)</label>
+          <input type="number" id="wastage" value="10" min="5" max="20" step="5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500" required />
+        </div>
+
+        <button type="button" onclick="calculateBrickwork()" class="w-full bg-amber-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-amber-700 transition">
+          Calculate Bricks & Mortar
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-amber-50 border border-amber-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-amber-800 mb-4">Brickwork / Blockwork Estimate</h3>
+        <p id="wallArea" class="text-xl mb-3"></p>
+        <p id="numUnits" class="text-2xl font-bold mb-3"></p>
+        <p id="mortar" class="text-xl"></p>
+      </div>
+
+      <div class="mt-8 text-sm text-gray-600">
+        <p><strong>Assumptions:</strong> 10 mm mortar joint, standard brick/block size. Wastage 5–15% common for cutting/breakage. Cement:sand mortar ratio 1:6 (approx. 0.3–0.4 cft mortar per 100 bricks).</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function calculateBrickwork() {
+      const l = parseFloat(document.getElementById('length').value);
+      const h = parseFloat(document.getElementById('height').value);
+      const thicknessFt = parseFloat(document.getElementById('thickness').value);
+      const material = document.getElementById('material').value;
+      const wastage = parseFloat(document.getElementById('wastage').value) / 100;
+
+      if ([l,h,thicknessFt].some(isNaN) || l <= 0 || h <= 0) {
+        alert("Enter valid wall dimensions");
+        return;
+      }
+
+      const wallArea = l * h; // sq.ft per side
+      const volumeCft = wallArea * thicknessFt; // total wall volume
+
+      let unitSizeSqft, mortarPer100;
+
+      if (material === 'brick') {
+        // Standard Indian brick ~9×4.5×3 inch → ~0.21 sq.ft face area per brick (with mortar)
+        unitSizeSqft = 0.75 * 0.375; // 9"×4.5" face
+        mortarPer100 = 1.2; // cft mortar per 100 bricks
+      } else {
+        // Concrete block 8×8×12 inch → face 8"×12" = 0.666 sq.ft
+        unitSizeSqft = (8/12) * (12/12); // 0.666 sq.ft
+        mortarPer100 = 0.8; // less mortar for blocks
+      }
+
+      let units = Math.ceil(wallArea / unitSizeSqft * (1 + wastage));
+
+      let mortarCft = (units / 100) * mortarPer100;
+
+      document.getElementById('wallArea').innerHTML = `<strong>Total Wall Area (one side):</strong> ${wallArea.toFixed(1)} sq.ft`;
+      document.getElementById('numUnits').innerHTML = `<strong>${material === 'brick' ? 'Bricks' : 'Blocks'} Needed:</strong> ${units.toLocaleString('en-IN')} pcs`;
+      document.getElementById('mortar').innerHTML = `<strong>Mortar Volume (1:6 mix):</strong> ${mortarCft.toFixed(1)} cft (approx. ${Math.ceil(mortarCft * 8)} bags cement + sand)`;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
