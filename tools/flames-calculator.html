@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FLAMES Calculator – Classic Love Game</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">FLAMES Calculator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-pink-600">🔥 FLAMES – Friendship to Love Game</h2>
+
+      <form id="flamesForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Your Name</label>
+          <input type="text" id="name1" value="Shilpa" class="w-full p-4 border border-gray-300 rounded-lg text-xl focus:ring-pink-500 focus:border-pink-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Partner's Name</label>
+          <input type="text" id="name2" value="Rahul" class="w-full p-4 border border-gray-300 rounded-lg text-xl focus:ring-pink-500 focus:border-pink-500" required />
+        </div>
+
+        <button type="button" onclick="playFLAMES()" class="w-full bg-pink-600 text-white py-4 rounded-lg text-xl font-bold hover:bg-pink-700 transition">
+          Play FLAMES 🔥
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-pink-50 border border-pink-200 rounded-xl p-8 text-center">
+        <h3 class="text-4xl font-extrabold text-pink-700 mb-6" id="flameResult"></h3>
+        <p class="text-2xl font-medium text-gray-800" id="meaning"></p>
+        <p class="text-lg text-gray-600 mt-6 italic">Just for fun – classic school/college game!</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function playFLAMES() {
+      let name1 = document.getElementById('name1').value.trim().toLowerCase().replace(/\s+/g, '');
+      let name2 = document.getElementById('name2').value.trim().toLowerCase().replace(/\s+/g, '');
+
+      if (!name1 || !name2) {
+        alert("Please enter both names!");
+        return;
+      }
+
+      // Remove common letters
+      let combined = name1 + name2;
+      let unique = [...new Set(combined)].join('');
+      let count = combined.length - unique.length; // number of common letters
+
+      // FLAMES letters
+      let flames = "FLAMES";
+      let index = 0;
+
+      while (flames.length > 1) {
+        index = (index + count - 1) % flames.length;
+        flames = flames.slice(0, index) + flames.slice(index + 1);
+      }
+
+      const meanings = {
+        F: "Friends 💛",
+        L: "Lovers ❤️",
+        A: "Affection 💕",
+        M: "Marriage 💍",
+        E: "Enemies 😠",
+        S: "Siblings 👫"
+      };
+
+      document.getElementById('flameResult').textContent = flames;
+      document.getElementById('meaning').textContent = meanings[flames];
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
