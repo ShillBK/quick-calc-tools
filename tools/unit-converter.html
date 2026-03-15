@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Unit Converter – Length, Weight, Temp, Volume</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Unit Converter</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-gray-700">Convert Units Instantly</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+          <label class="block text-lg font-medium mb-2">Value</label>
+          <input type="number" id="value" value="100" step="0.01" class="w-full p-4 border border-gray-300 rounded-lg text-2xl focus:ring-gray-500 focus:border-gray-500" required />
+
+          <label class="block text-lg font-medium mt-6 mb-2">From</label>
+          <select id="fromUnit" class="w-full p-4 border border-gray-300 rounded-lg text-xl focus:ring-gray-500 focus:border-gray-500">
+            <!-- Length -->
+            <optgroup label="Length">
+              <option value="m">Meters (m)</option>
+              <option value="cm">Centimeters (cm)</option>
+              <option value="km">Kilometers (km)</option>
+              <option value="ft">Feet (ft)</option>
+              <option value="in">Inches (in)</option>
+            </optgroup>
+            <!-- Weight -->
+            <optgroup label="Weight">
+              <option value="kg">Kilograms (kg)</option>
+              <option value="g">Grams (g)</option>
+              <option value="lb">Pounds (lb)</option>
+            </optgroup>
+            <!-- Temperature -->
+            <optgroup label="Temperature">
+              <option value="c">Celsius (°C)</option>
+              <option value="f">Fahrenheit (°F)</option>
+            </optgroup>
+            <!-- Volume -->
+            <optgroup label="Volume">
+              <option value="l">Liters (L)</option>
+              <option value="ml">Milliliters (mL)</option>
+              <option value="gal">US Gallons</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">To</label>
+          <select id="toUnit" class="w-full p-4 border border-gray-300 rounded-lg text-xl focus:ring-gray-500 focus:border-gray-500">
+            <!-- Same options as fromUnit – populated dynamically if you want, but for simplicity same list -->
+            <optgroup label="Length">
+              <option value="m">Meters (m)</option>
+              <option value="cm">Centimeters (cm)</option>
+              <option value="km">Kilometers (km)</option>
+              <option value="ft">Feet (ft)</option>
+              <option value="in">Inches (in)</option>
+            </optgroup>
+            <optgroup label="Weight">
+              <option value="kg">Kilograms (kg)</option>
+              <option value="g">Grams (g)</option>
+              <option value="lb">Pounds (lb)</option>
+            </optgroup>
+            <optgroup label="Temperature">
+              <option value="c">Celsius (°C)</option>
+              <option value="f">Fahrenheit (°F)</option>
+            </optgroup>
+            <optgroup label="Volume">
+              <option value="l">Liters (L)</option>
+              <option value="ml">Milliliters (mL)</option>
+              <option value="gal">US Gallons</option>
+            </optgroup>
+          </select>
+
+          <div class="mt-10">
+            <button onclick="convertUnit()" class="w-full bg-gray-700 text-white py-4 rounded-lg text-xl font-bold hover:bg-gray-800 transition">
+              Convert
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="result" class="mt-10 hidden bg-gray-100 border border-gray-300 rounded-xl p-8 text-center">
+        <h3 class="text-4xl font-extrabold text-gray-800 mb-6" id="resultValue"></h3>
+        <p class="text-2xl" id="resultUnit"></p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function convertUnit() {
+      const value = parseFloat(document.getElementById('value').value);
+      const from = document.getElementById('fromUnit').value;
+      const to = document.getElementById('toUnit').value;
+
+      if (isNaN(value)) {
+        alert("Enter a valid number");
+        return;
+      }
+
+      if (from === to) {
+        document.getElementById('resultValue').textContent = value.toFixed(2);
+        document.getElementById('resultUnit').textContent = to.toUpperCase();
+        document.getElementById('result').classList.remove('hidden');
+        return;
+      }
+
+      // Conversion factors to base unit (meters, kg, celsius, liters)
+      const factors = {
+        // Length (to meters)
+        m: 1, cm: 0.01, km: 1000, ft: 0.3048, in: 0.0254,
+        // Weight (to kg)
+        kg: 1, g: 0.001, lb: 0.453592,
+        // Temp – special handling
+        // Volume (to liters)
+        l: 1, ml: 0.001, gal: 3.78541
+      };
+
+      if (from === 'c' || from === 'f' || to === 'c' || to === 'f') {
+        let celsius;
+        if (from === 'c') celsius = value;
+        else celsius = (value - 32) * 5/9;
+
+        let result = to === 'c' ? celsius : celsius * 9/5 + 32;
+        document.getElementById('resultValue').textContent = result.toFixed(2);
+        document.getElementById('resultUnit').textContent = to.toUpperCase();
+      } else {
+        const base = value * factors[from];
+        const result = base / factors[to];
+        document.getElementById('resultValue').textContent = result.toFixed(4);
+        document.getElementById('resultUnit').textContent = to.toUpperCase();
+      }
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
