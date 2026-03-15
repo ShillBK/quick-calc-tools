@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Food / Meal Calorie Calculator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Food / Meal Calorie Calculator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-purple-700">Calculate Calories in Your Meal</h2>
+
+      <div class="mb-8">
+        <label class="block text-lg font-medium mb-2">Search & Add Food</label>
+        <input type="text" id="foodSearch" placeholder="e.g. idli, chicken curry, rice..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" oninput="filterFoods()" />
+      </div>
+
+      <div id="foodList" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-60 overflow-y-auto mb-6"></div>
+
+      <div id="mealItems" class="space-y-4 mb-8"></div>
+
+      <div class="bg-purple-50 border border-purple-200 rounded-xl p-6">
+        <div class="flex justify-between text-xl font-bold">
+          <span>Total Calories:</span>
+          <span id="totalCalories">0 kcal</span>
+        </div>
+        <div class="flex justify-between mt-2 text-lg">
+          <span>Protein / Carbs / Fat (approx):</span>
+          <span id="macros">0g / 0g / 0g</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Database of common foods (calories per 100g or per piece – add more as needed)
+    const foods = [
+      {name: "Idli (1 piece)", cal: 60, protein: 2, carb: 12, fat: 0.5},
+      {name: "Dosa (plain, 1 medium)", cal: 170, protein: 4, carb: 30, fat: 3},
+      {name: "Rice (cooked white, 1 cup ~200g)", cal: 205, protein: 4, carb: 45, fat: 0.5},
+      {name: "Chicken Curry (100g)", cal: 180, protein: 18, carb: 5, fat: 10},
+      {name: "Roti / Chapati (1 medium)", cal: 80, protein: 3, carb: 15, fat: 1},
+      {name: "Dal (cooked, 1 cup ~200g)", cal: 200, protein: 12, carb: 30, fat: 4},
+      {name: "Paneer (100g)", cal: 265, protein: 18, carb: 3, fat: 20},
+      {name: "Egg (1 whole boiled)", cal: 78, protein: 6, carb: 0.6, fat: 5},
+      {name: "Banana (1 medium)", cal: 105, protein: 1, carb: 27, fat: 0.4},
+      {name: "Apple (1 medium)", cal: 95, protein: 0.5, carb: 25, fat: 0.3},
+      {name: "Almonds (10 pieces ~15g)", cal: 100, protein: 3.5, carb: 3, fat: 9},
+      {name: "Biryani (chicken, 1 plate ~300g)", cal: 550, protein: 25, carb: 70, fat: 18},
+      // Add 50–100 more common Indian foods...
+    ];
+
+    // Render food list
+    function renderFoods(filtered = foods) {
+      const container = document.getElementById('foodList');
+      container.innerHTML = '';
+      filtered.forEach(food => {
+        const div = document.createElement('div');
+        div.className = 'bg-white border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-purple-50';
+        div.innerHTML = `
+          <p class="font-medium">${food.name}</p>
+          <p class="text-sm text-gray-600">${food.cal} kcal • P:${food.protein}g C:${food.carb}g F:${food.fat}g</p>
+        `;
+        div.onclick = () => addToMeal(food);
+        container.appendChild(div);
+      });
+    }
+
+    renderFoods();
+
+    // Filter on search
+    function filterFoods() {
+      const search = document.getElementById('foodSearch').value.toLowerCase();
+      const filtered = foods.filter(f => f.name.toLowerCase().includes(search));
+      renderFoods(filtered);
+    }
+
+    let meal = [];
+
+    function addToMeal(food) {
+      const qty = prompt(`How many portions of ${food.name}? (default 1)`, "1");
+      const quantity = parseFloat(qty) || 1;
+      if (quantity > 0) {
+        meal.push({ ...food, quantity });
+        renderMeal();
+      }
+    }
+
+    function renderMeal() {
+      const container = document.getElementById('mealItems');
+      container.innerHTML = '';
+      let totalCal = 0, totalP = 0, totalC = 0, totalF = 0;
+
+      meal.forEach((item, index) => {
+        const cal = item.cal * item.quantity;
+        const p = item.protein * item.quantity;
+        const c = item.carb * item.quantity;
+        const f = item.fat * item.quantity;
+
+        totalCal += cal;
+        totalP += p;
+        totalC += c;
+        totalF += f;
+
+        const div = document.createElement('div');
+        div.className = 'bg-purple-50 p-3 rounded-lg flex justify-between items-center';
+        div.innerHTML = `
+          <div>
+            <p class="font-medium">${item.name} × ${item.quantity}</p>
+            <p class="text-sm text-gray-600">${cal.toFixed(0)} kcal</p>
+          </div>
+          <button onclick="removeItem(${index})" class="text-red-600 hover:text-red-800">Remove</button>
+        `;
+        container.appendChild(div);
+      });
+
+      document.getElementById('totalCalories').textContent = `${Math.round(totalCal)} kcal`;
+      document.getElementById('macros').textContent = `${Math.round(totalP)}g protein / ${Math.round(totalC)}g carbs / ${Math.round(totalF)}g fat`;
+    }
+
+    function removeItem(index) {
+      meal.splice(index, 1);
+      renderMeal();
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
