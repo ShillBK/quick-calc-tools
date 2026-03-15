@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Freelance Rate Calculator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Freelance Rate Calculator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-teal-700">Calculate Your Freelance Rate</h2>
+
+      <form id="freelanceForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Desired Annual Take-Home Income (₹)</label>
+          <input type="number" id="desiredIncome" value="600000" min="100000" step="10000" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Expected Non-Billable Time (% of working hours)</label>
+          <input type="number" id="nonBillablePct" value="40" min="0" max="80" step="5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500" required />
+          <p class="text-sm text-gray-600">(admin, marketing, sick days, holidays – 30–50% common)</p>
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Estimated Annual Expenses (₹) – software, taxes, internet, etc.</label>
+          <input type="number" id="expenses" value="120000" min="0" step="10000" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500" />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Effective Working Days per Year</label>
+          <input type="number" id="days" value="220" min="100" max="300" step="10" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500" required />
+          <p class="text-sm text-gray-600">(~240 working days minus holidays & vacations)</p>
+        </div>
+
+        <button type="button" onclick="calculateFreelanceRate()" class="w-full bg-teal-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-teal-700 transition">
+          Calculate Required Rate
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-teal-50 border border-teal-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-teal-800 mb-4">Your Required Freelance Rates</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-lg">
+          <div>
+            <p><strong>Annual Revenue Needed:</strong></p>
+            <p id="revenueNeeded" class="text-2xl font-bold"></p>
+          </div>
+          <div>
+            <p><strong>Monthly Revenue Target:</strong></p>
+            <p id="monthlyTarget" class="text-2xl font-bold"></p>
+          </div>
+          <div class="col-span-full mt-4">
+            <p><strong>Hourly Rate (billable hours):</strong></p>
+            <p id="hourlyRate" class="text-3xl font-extrabold text-teal-700"></p>
+          </div>
+        </div>
+        <p class="mt-6 text-sm text-gray-600">Tip: Add 10–20% buffer for unexpected costs / dry periods.</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function calculateFreelanceRate() {
+      const income = parseFloat(document.getElementById('desiredIncome').value);
+      const nonBillable = parseFloat(document.getElementById('nonBillablePct').value) / 100;
+      const expenses = parseFloat(document.getElementById('expenses').value) || 0;
+      const days = parseFloat(document.getElementById('days').value);
+
+      if ([income, nonBillable, days].some(isNaN) || income <= 0 || days <= 0) {
+        alert("Please enter valid numbers");
+        return;
+      }
+
+      const billablePct = 1 - nonBillable;
+      const totalNeeded = income + expenses;
+      const billableDays = days * billablePct;
+      const hoursPerDay = 6; // realistic billable hours/day for freelancers
+      const billableHours = billableDays * hoursPerDay;
+
+      const hourly = totalNeeded / billableHours;
+      const monthly = totalNeeded / 12;
+
+      document.getElementById('revenueNeeded').textContent = `₹${Math.round(totalNeeded).toLocaleString('en-IN')}`;
+      document.getElementById('monthlyTarget').textContent = `₹${Math.round(monthly).toLocaleString('en-IN')}`;
+      document.getElementById('hourlyRate').textContent = `₹${Math.round(hourly).toLocaleString('en-IN')} / hour`;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
