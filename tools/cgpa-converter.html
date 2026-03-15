@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CGPA to Percentage Converter</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">CGPA to Percentage Converter</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-cyan-700">Convert CGPA to Percentage</h2>
+
+      <form id="cgpaForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">CGPA (out of 10)</label>
+          <input type="number" id="cgpa" value="8.4" min="0" max="10" step="0.01" class="w-full p-4 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Conversion Formula</label>
+          <select id="formula" class="w-full p-4 border border-gray-300 rounded-lg text-xl focus:ring-cyan-500 focus:border-cyan-500">
+            <option value="9.5">CBSE / Most Universities (Percentage = CGPA × 9.5)</option>
+            <option value="10">Simple (Percentage = CGPA × 10)</option>
+            <option value="9">Some colleges (Percentage = CGPA × 9)</option>
+          </select>
+        </div>
+
+        <button type="button" onclick="convertCGPA()" class="w-full bg-cyan-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-cyan-700 transition">
+          Convert
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-cyan-50 border border-cyan-200 rounded-xl p-8 text-center">
+        <h3 class="text-4xl font-extrabold text-cyan-700 mb-6" id="percent"></h3>
+        <p class="text-xl text-gray-800" id="note"></p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function convertCGPA() {
+      const cgpa = parseFloat(document.getElementById('cgpa').value);
+      const formula = parseFloat(document.getElementById('formula').value);
+
+      if (isNaN(cgpa) || cgpa < 0 || cgpa > 10) {
+        alert("Please enter CGPA between 0 and 10");
+        return;
+      }
+
+      const percent = cgpa * formula;
+
+      document.getElementById('percent').textContent = `${percent.toFixed(2)}%`;
+      document.getElementById('note').textContent = `Using ${formula === 9.5 ? "CBSE / standard university" : formula === 10 ? "simple" : "alternative"} conversion formula`;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
