@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Exam Score Predictor – Target Percentage</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Exam Score Predictor</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-cyan-700">Calculate Required Marks to Reach Target</h2>
+
+      <form id="predictForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Total Marks of Completed Exams</label>
+          <input type="number" id="completedMarks" value="180" min="0" step="1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Total Marks of Completed Exams (max)</label>
+          <input type="number" id="completedMax" value="200" min="1" step="1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Remaining Exams Total Marks (max)</label>
+          <input type="number" id="remainingMax" value="300" min="1" step="1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Target Percentage (%)</label>
+          <input type="number" id="target" value="85" min="0" max="100" step="0.1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required />
+        </div>
+
+        <button type="button" onclick="predictScore()" class="w-full bg-cyan-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-cyan-700 transition">
+          Predict Required Marks
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-cyan-50 border border-cyan-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-cyan-800 mb-4">You Need</h3>
+        <p id="required" class="text-3xl font-bold mb-4"></p>
+        <p id="percent" class="text-xl"></p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function predictScore() {
+      const compMarks = parseFloat(document.getElementById('completedMarks').value);
+      const compMax = parseFloat(document.getElementById('completedMax').value);
+      const remMax = parseFloat(document.getElementById('remainingMax').value);
+      const targetPct = parseFloat(document.getElementById('target').value) / 100;
+
+      if ([compMarks, compMax, remMax, targetPct].some(isNaN) || compMarks > compMax || targetPct <= 0) {
+        alert("Please enter valid values");
+        return;
+      }
+
+      const totalMax = compMax + remMax;
+      const targetMarks = totalMax * targetPct;
+      const requiredRem = targetMarks - compMarks;
+
+      const requiredPct = (requiredRem / remMax) * 100;
+
+      document.getElementById('required').innerHTML = `₹{Math.round(requiredRem).toLocaleString('en-IN')} marks out of ${remMax}`;
+      document.getElementById('percent').innerHTML = `That's <strong>${requiredPct.toFixed(1)}%</strong> in remaining exams to reach ${document.getElementById('target').value}% overall`;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
