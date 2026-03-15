@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Water Intake Calculator – Daily Hydration</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Water Intake Calculator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-purple-700">Calculate Your Daily Water Needs</h2>
+
+      <form id="waterForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Body Weight (kg)</label>
+          <input type="number" id="weight" value="70" min="30" step="0.5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" required />
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Activity Level</label>
+          <select id="activity" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+            <option value="1.0">Sedentary (office job, little exercise)</option>
+            <option value="1.2">Lightly active (walk 30–60 min/day)</option>
+            <option value="1.4" selected>Moderately active (gym/workout 3–5 days/week)</option>
+            <option value="1.6">Very active (intense exercise 6–7 days/week)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Climate (Bengaluru March – warm & humid)</label>
+          <select id="climate" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+            <option value="0">Normal / Cool</option>
+            <option value="0.5" selected>Warm (25–33°C, typical Bengaluru summer start)</option>
+            <option value="1.0">Hot & humid (exercise outdoors)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium mb-2">Exercise Duration Today (minutes)</label>
+          <input type="number" id="exercise" value="45" min="0" step="15" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" placeholder="Add extra water for workouts" />
+        </div>
+
+        <button type="button" onclick="calculateWater()" class="w-full bg-purple-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-purple-700 transition">
+          Calculate Daily Water
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-purple-50 border border-purple-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-purple-800 mb-4">Recommended Daily Intake</h3>
+        <p id="baseWater" class="text-xl mb-3"></p>
+        <p id="totalWater" class="text-xl mb-3 font-bold"></p>
+        <p id="tips" class="text-lg"></p>
+      </div>
+
+      <div class="mt-8 text-sm text-gray-600">
+        <p><strong>Basis:</strong> ~30–35 ml per kg body weight (common India guideline) + adjustments for activity, warm Bengaluru climate (~32°C March avg), and exercise (extra ~0.4–0.6 L/hour). Includes all fluids (water, tea, etc.); aim for mostly plain water.</p>
+        <p class="mt-2">Listen to your body – urine pale yellow = good hydration. Consult doctor if health conditions.</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function calculateWater() {
+      const weight = parseFloat(document.getElementById('weight').value);
+      const activity = parseFloat(document.getElementById('activity').value);
+      const climate = parseFloat(document.getElementById('climate').value);
+      const exerciseMin = parseFloat(document.getElementById('exercise').value) || 0;
+
+      if (isNaN(weight) || weight < 30) {
+        alert("Enter valid weight (kg)");
+        return;
+      }
+
+      // Base: 33 ml/kg (mid-range India/common rec)
+      let baseLiters = weight * 0.033;
+
+      // Activity multiplier
+      baseLiters *= activity;
+
+      // Climate extra (Bengaluru warm March)
+      baseLiters += climate;
+
+      // Exercise extra (~400–600 ml per hour)
+      const exerciseHours = exerciseMin / 60;
+      baseLiters += exerciseHours * 0.5; // avg 500 ml/hour
+
+      // Round nicely
+      const total = Math.round(baseLiters * 10) / 10;
+      const glasses = Math.round(total / 0.25); // 250 ml glass
+
+      document.getElementById('baseWater').innerHTML = `<strong>Base (weight only):</strong> ${baseLiters.toFixed(1)} L`;
+      document.getElementById('totalWater').innerHTML = `<strong>Total Recommended:</strong> ${total} L / day (~${glasses} glasses of 250 ml)`;
+      document.getElementById('tips').innerHTML = `<strong>Tips:</strong> Start with 500 ml on waking, sip throughout day. In Bengaluru's March heat, carry a bottle!`;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru 2026</p>
+  </footer>
+</body>
+</html>
