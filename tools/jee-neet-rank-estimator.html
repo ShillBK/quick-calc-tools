@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JEE / NEET Rank Estimator – Bengaluru 2026</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">JEE / NEET Rank Estimator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-indigo-700">Estimate Your JEE Main or NEET Rank 2026</h2>
+      <p class="text-center text-gray-600 mb-6">Enter expected marks to get approximate percentile & All India Rank (AIR). Based on NTA trends & coaching data (March 2026). Not official – actual varies with normalization & total candidates.</p>
+
+      <div class="flex justify-center gap-4 mb-8">
+        <button onclick="showTool('jee')" class="px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700">JEE Main 2026</button>
+        <button onclick="showTool('neet')" class="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700">NEET 2026</button>
+      </div>
+
+      <div id="jeeTool" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Expected Marks out of 300 (JEE Main)</label>
+          <input type="number" id="jeeMarks" value="150" min="0" max="300" step="1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" />
+        </div>
+        <div>
+          <label class="block text-lg font-medium mb-2">Category</label>
+          <select id="jeeCategory" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+            <option value="general">General / EWS</option>
+            <option value="obc">OBC-NCL</option>
+            <option value="sc">SC</option>
+            <option value="st">ST</option>
+          </select>
+        </div>
+        <button onclick="estimateJEERank()" class="w-full bg-indigo-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-indigo-700 transition">Estimate JEE Rank</button>
+      </div>
+
+      <div id="neetTool" class="space-y-6 hidden">
+        <div>
+          <label class="block text-lg font-medium mb-2">Expected Marks out of 720 (NEET)</label>
+          <input type="number" id="neetMarks" value="550" min="0" max="720" step="1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500" />
+        </div>
+        <div>
+          <label class="block text-lg font-medium mb-2">Category</label>
+          <select id="neetCategory" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+            <option value="general">General / EWS</option>
+            <option value="obc">OBC</option>
+            <option value="sc">SC</option>
+            <option value="st">ST</option>
+          </select>
+        </div>
+        <button onclick="estimateNEETRank()" class="w-full bg-purple-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-purple-700 transition">Estimate NEET Rank</button>
+      </div>
+
+      <div id="result" class="mt-10 hidden bg-indigo-50 border border-indigo-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-indigo-800 mb-4">Your Estimated Rank & Percentile</h3>
+        <p id="resultText" class="text-xl mb-2"></p>
+        <p id="resultNote" class="text-lg text-gray-700"></p>
+        <p class="text-sm text-gray-600 mt-4 italic">
+          Note: Approximate ranges based on 2025–2026 NTA trends & coaching data (Allen, Aakash, Careers360, Shiksha). JEE: ~12–14 lakh candidates; NEET: ~22–24 lakh. Actual rank depends on normalization, difficulty, & total applicants. Use for planning – check official NTA results.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function showTool(tool) {
+      document.getElementById('jeeTool').classList.add('hidden');
+      document.getElementById('neetTool').classList.add('hidden');
+      document.getElementById(tool + 'Tool').classList.remove('hidden');
+      document.getElementById('result').classList.add('hidden');
+    }
+
+    function estimateJEERank() {
+      const marks = parseInt(document.getElementById('jeeMarks').value);
+      const category = document.getElementById('jeeCategory').value;
+
+      if (isNaN(marks) || marks < 0 || marks > 300) {
+        alert("Enter marks between 0 and 300.");
+        return;
+      }
+
+      let percentile = '';
+      let rankRange = '';
+      let note = 'General/EWS category estimate. Reserved categories get better ranks for same marks.';
+
+      // Approximate JEE Main 2026 marks vs percentile/rank (from trends: 250+ = 99.9+, 200 = 99+, 150 = 97–98, etc.)
+      if (marks >= 250) { percentile = '99.90+'; rankRange = 'Top 5,000–10,000'; }
+      else if (marks >= 200) { percentile = '99.00–99.90'; rankRange = '10,000–25,000'; }
+      else if (marks >= 180) { percentile = '98.50–99.00'; rankRange = '25,000–40,000'; }
+      else if (marks >= 150) { percentile = '96–98'; rankRange = '40,000–80,000'; }
+      else if (marks >= 120) { percentile = '92–96'; rankRange = '80,000–1,50,000'; }
+      else if (marks >= 90) { percentile = '85–92'; rankRange = '1,50,000–3,00,000'; }
+      else { percentile = 'Below 85'; rankRange = '3,00,000+'; }
+
+      if (category !== 'general') note += ' Reserved category ranks are significantly better for same marks (e.g., OBC/SC/ST cutoffs lower).';
+
+      document.getElementById('resultText').innerHTML = `<strong>Expected Percentile:</strong> ${percentile}<br><strong>Estimated AIR:</strong> ${rankRange}`;
+      document.getElementById('resultNote').innerHTML = note;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+
+    function estimateNEETRank() {
+      const marks = parseInt(document.getElementById('neetMarks').value);
+      const category = document.getElementById('neetCategory').value;
+
+      if (isNaN(marks) || marks < 0 || marks > 720) {
+        alert("Enter marks between 0 and 720.");
+        return;
+      }
+
+      let rankRange = '';
+      let note = 'General/EWS estimate. Reserved categories have much better ranks for same marks.';
+
+      // Approximate NEET 2026 marks vs rank (from trends: 700+ = top 1k, 650 = top 5k–10k, 600 = 20k–50k, etc.)
+      if (marks >= 700) { rankRange = 'Top 1–1,000'; }
+      else if (marks >= 650) { rankRange = '1,000–10,000'; }
+      else if (marks >= 600) { rankRange = '10,000–50,000'; }
+      else if (marks >= 550) { rankRange = '50,000–1,50,000'; }
+      else if (marks >= 500) { rankRange = '1,50,000–3,00,000'; }
+      else if (marks >= 450) { rankRange = '3,00,000–6,00,000'; }
+      else { rankRange = '6,00,000+'; }
+
+      if (category !== 'general') note += ' For OBC/SC/ST, qualifying is lower (40th percentile ~107–134 marks), and good colleges possible at lower ranks.';
+
+      document.getElementById('resultText').innerHTML = `<strong>Estimated AIR:</strong> ${rankRange}`;
+      document.getElementById('resultNote').innerHTML = note;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru March 2026</p>
+  </footer>
+</body>
+</html>
