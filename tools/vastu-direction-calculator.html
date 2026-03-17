@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vastu Direction Calculator – Bengaluru 2026</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Vastu Direction Calculator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-amber-700">Vastu Shastra Direction Guide for Your Home</h2>
+      <p class="text-center text-gray-600 mb-6">Select your home's main facing direction (entrance direction) to see recommended placements for rooms and elements. Ideal for Bengaluru flats, villas & plots.</p>
+      <form id="vastuForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">House Facing Direction (Main Entrance Faces)</label>
+          <select id="facing" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500">
+            <option value="north">North</option>
+            <option value="northeast" selected>North-East (Most Auspicious)</option>
+            <option value="east">East</option>
+            <option value="southeast">South-East</option>
+            <option value="south">South</option>
+            <option value="southwest">South-West</option>
+            <option value="west">West</option>
+            <option value="northwest">North-West</option>
+          </select>
+        </div>
+        <button type="button" onclick="showVastuRecommendations()" class="w-full bg-amber-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-amber-700 transition">
+          Get Vastu Recommendations
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-amber-50 border border-amber-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-amber-800 mb-4">Recommended Directions for Your Home</h3>
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-amber-100">
+              <th class="p-3 border">Room / Element</th>
+              <th class="p-3 border">Best Direction</th>
+              <th class="p-3 border">Status</th>
+              <th class="p-3 border">Why / Note</th>
+            </tr>
+          </thead>
+          <tbody id="vastuTable"></tbody>
+        </table>
+        <p class="text-sm text-gray-600 mt-6 italic">
+          Note: Vastu is traditional guidance for positive energy flow (prana). North, East, North-East facings are most auspicious. Kitchen in South-East, Master Bedroom in South-West, Pooja in North-East. Avoid toilets in North-East. For Bengaluru homes, East/North facing flats are popular. Consult a Vastu expert for personalized remedies (mirrors, colors, plants) if needed.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function showVastuRecommendations() {
+      const facing = document.getElementById('facing').value;
+      const tableBody = document.getElementById('vastuTable');
+      tableBody.innerHTML = ''; // Clear previous
+
+      const recommendations = [
+        { element: "Main Entrance", best: "North, East, North-East", status: "Auspicious if matches", note: "North-East is best for prosperity" },
+        { element: "Kitchen", best: "South-East", status: "Ideal", note: "Fire element; South-West alternative if needed" },
+        { element: "Master Bedroom", best: "South-West", status: "Ideal", note: "Stability & rest" },
+        { element: "Children's Bedroom / Study", best: "North or East", status: "Good", note: "Promotes concentration & growth" },
+        { element: "Pooja Room / Prayer", best: "North-East", status: "Highly Auspicious", note: "Positive energy zone (Brahmasthan)" },
+        { element: "Bathroom / Toilet", best: "North-West or South-East", status: "Avoid North-East", note: "Never in North-East or center" },
+        { element: "Living Room", best: "North or East", status: "Good", note: "Open & airy" },
+        { element: "Staircase", best: "South or West", status: "Avoid North-East", note: "Clockwise ascent" }
+      ];
+
+      recommendations.forEach(rec => {
+        const row = document.createElement('tr');
+        row.className = 'border-b';
+        row.innerHTML = `
+          <td class="p-3 border">${rec.element}</td>
+          <td class="p-3 border font-medium">${rec.best}</td>
+          <td class="p-3 border">
+            ${facing.toLowerCase().includes(rec.best.toLowerCase().split(',')[0].trim()) ? '<span class="text-green-600">✓ Good Match</span>' : '<span class="text-yellow-600">Check</span>'}
+          </td>
+          <td class="p-3 border text-sm">${rec.note}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru March 2026</p>
+  </footer>
+</body>
+</html>
