@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Land Area Converter – Bengaluru 2026</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Land Area Converter</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-teal-700">Convert Land Area Units (India Focus)</h2>
+      <p class="text-center text-gray-600 mb-6">Quickly convert between common land measurement units used in Bengaluru/Karnataka & India (Guntha, Cent, Acre, Sq Ft, etc.).</p>
+      <form id="areaForm" class="space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-lg font-medium mb-2">Value</label>
+            <input type="number" id="value" value="1" min="0" step="any" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500" required />
+          </div>
+          <div>
+            <label class="block text-lg font-medium mb-2">From Unit</label>
+            <select id="fromUnit" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500">
+              <option value="sqft">Square Feet (sq ft)</option>
+              <option value="sqyd">Square Yards (sq yd / Gaj)</option>
+              <option value="sqm">Square Meters (sq m)</option>
+              <option value="acre">Acre</option>
+              <option value="hectare">Hectare</option>
+              <option value="guntha" selected>Guntha (Karnataka common)</option>
+              <option value="cent">Cent (South India)</option>
+              <option value="ankanam">Ankanam (Karnataka/AP)</option>
+            </select>
+          </div>
+        </div>
+        <button type="button" onclick="convertArea()" class="w-full bg-teal-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-teal-700 transition">
+          Convert
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-teal-50 border border-teal-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-teal-800 mb-4">Conversions</h3>
+        <ul id="conversions" class="space-y-3 text-lg"></ul>
+        <p class="text-sm text-gray-600 mt-6 italic">
+          Note: Based on standard conversions in Karnataka/Bengaluru (2026): 1 Guntha = 1089 sq ft, 40 Guntha = 1 Acre, 1 Cent ≈435.6 sq ft, 1 Ankanam ≈72 sq ft (may vary slightly by local custom). For exact legal measurements, consult revenue records or surveyor.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const conversions = {
+      sqft: 1,
+      sqyd: 9,              // 1 sq yd = 9 sq ft
+      sqm: 10.76391042,     // 1 sq m ≈ 10.7639 sq ft
+      acre: 43560,          // 1 acre = 43560 sq ft
+      hectare: 107639.104,  // 1 hectare = 107639.104 sq ft (approx)
+      guntha: 1089,         // 1 Guntha = 1089 sq ft (Karnataka standard)
+      cent: 435.6,          // 1 Cent ≈ 435.6 sq ft
+      ankanam: 72           // 1 Ankanam ≈ 72 sq ft (common in Karnataka/AP)
+    };
+
+    function convertArea() {
+      const value = parseFloat(document.getElementById('value').value);
+      const fromUnit = document.getElementById('fromUnit').value;
+
+      if (isNaN(value) || value <= 0) {
+        alert("Please enter a positive value.");
+        return;
+      }
+
+      // Convert input to square feet base
+      const inSqft = value * conversions[fromUnit];
+
+      // Generate outputs
+      let html = '';
+      for (const [unit, factor] of Object.entries(conversions)) {
+        if (unit === fromUnit) continue;
+        const converted = (inSqft / factor).toFixed(4);
+        let displayUnit = unit.toUpperCase();
+        if (unit === 'sqft') displayUnit = 'Square Feet';
+        if (unit === 'sqyd') displayUnit = 'Square Yards';
+        if (unit === 'sqm') displayUnit = 'Square Meters';
+        if (unit === 'guntha') displayUnit = 'Guntha';
+        if (unit === 'cent') displayUnit = 'Cent';
+        if (unit === 'ankanam') displayUnit = 'Ankanam';
+        html += `<li><strong>${converted}</strong> ${displayUnit}</li>`;
+      }
+
+      document.getElementById('conversions').innerHTML = html;
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru March 2026</p>
+  </footer>
+</body>
+</html>
