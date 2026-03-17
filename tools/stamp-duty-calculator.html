@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stamp Duty & Registration Calculator – Bengaluru 2026</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Stamp Duty Calculator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-amber-700">Stamp Duty & Registration Charges Calculator (Karnataka 2026)</h2>
+      <p class="text-center text-gray-600 mb-6">Estimate costs for property registration in Bengaluru/Karnataka. Uses higher of sale value or guidance value (circle rate). Current rates: Stamp Duty 2–5%, Registration 2%.</p>
+      <form id="stampForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Sale Consideration / Agreement Value (₹)</label>
+          <input type="number" id="saleValue" value="5000000" min="100000" step="1000" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500" required />
+        </div>
+        <div>
+          <label class="block text-lg font-medium mb-2">Guidance Value / Circle Rate (₹) – From Kaveri portal</label>
+          <input type="number" id="guidanceValue" value="5500000" min="0" step="1000" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500" required />
+          <p class="text-sm text-gray-500 mt-1">Enter higher of sale or guidance value for accurate calc. Check Kaveri portal for your property.</p>
+        </div>
+        <div>
+          <label class="block text-lg font-medium mb-2">Property Type / Location</label>
+          <select id="propertyType" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500">
+            <option value="urban">Urban Bengaluru (5% stamp duty typical)</option>
+            <option value="mid">Mid-range (3% slab)</option>
+            <option value="low">Low-value (2% slab)</option>
+          </select>
+        </div>
+        <button type="button" onclick="calculateStampDuty()" class="w-full bg-amber-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-amber-700 transition">
+          Calculate Charges
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-amber-50 border border-amber-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-amber-800 mb-4">Estimated Registration Costs</h3>
+        <p id="baseValue" class="text-xl mb-2"></p>
+        <p id="stampDuty" class="text-xl mb-2"></p>
+        <p id="registration" class="text-xl mb-2"></p>
+        <p id="totalCost" class="text-3xl font-bold mb-3"></p>
+        <p id="extraNote" class="text-lg text-gray-700 mb-2"></p>
+        <p class="text-sm text-gray-600 mt-4 italic">
+          Note: Based on Karnataka rates March 2026 (Stamp Duty 2–5% on higher of sale/guidance value; Registration 2%). Approx 10% surcharge + 2% cess may apply (total ~7–7.6%). Women buyers get concessions in some cases. Verify exact on Kaveri portal (kaveri.karnataka.gov.in) or Sub-Registrar office – guidance values revised periodically (possible hike April 2026).
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function calculateStampDuty() {
+      const sale = parseFloat(document.getElementById('saleValue').value);
+      const guidance = parseFloat(document.getElementById('guidanceValue').value);
+      const type = document.getElementById('propertyType').value;
+
+      if (isNaN(sale) || sale <= 0 || isNaN(guidance) || guidance < 0) {
+        alert("Enter valid positive values for sale and guidance.");
+        return;
+      }
+
+      const base = Math.max(sale, guidance);
+
+      let stampRate = 0.05; // default urban 5%
+      if (type === 'mid') stampRate = 0.03;
+      if (type === 'low') stampRate = 0.02;
+
+      const stampDuty = base * stampRate;
+      const registration = base * 0.02; // 2% registration fee
+      const total = stampDuty + registration; // approximate; add surcharge/cess note
+
+      document.getElementById('baseValue').innerHTML = `<strong>Base Value (higher of sale/guidance):</strong> ₹${base.toLocaleString('en-IN')}`;
+      document.getElementById('stampDuty').innerHTML = `<strong>Stamp Duty (${(stampRate*100)}%):</strong> ₹${Math.round(stampDuty).toLocaleString('en-IN')}`;
+      document.getElementById('registration').innerHTML = `<strong>Registration Fee (2%):</strong> ₹${Math.round(registration).toLocaleString('en-IN')}`;
+      document.getElementById('totalCost').innerHTML = `<strong>Total Estimated Charges:</strong> ₹${Math.round(total).toLocaleString('en-IN')}`;
+      document.getElementById('extraNote').innerHTML = `Approx surcharge (10%) + cess (2%) may add ₹${Math.round(total * 0.12).toLocaleString('en-IN')} extra. Total ~₹${Math.round(total * 1.12).toLocaleString('en-IN')} (check official).`;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru March 2026</p>
+  </footer>
+</body>
+</html>
