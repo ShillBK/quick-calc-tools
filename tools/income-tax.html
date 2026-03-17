@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Income Tax Calculator FY 2025-26 – Bengaluru 2026</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Income Tax Calculator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-green-700">Income Tax FY 2025-26 (AY 2026-27) – Old vs New Regime</h2>
+      <p class="text-center text-gray-600 mb-6">Estimate tax liability for salaried individuals in India (Bengaluru focus). Enter gross income & deductions to compare regimes.</p>
+      <form id="taxForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Gross Annual Income (₹) – Salary + Other</label>
+          <input type="number" id="grossIncome" value="800000" min="0" step="1000" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500" required />
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-lg font-medium mb-2">Standard Deduction (auto-applied)</label>
+            <p class="text-gray-700">New Regime: ₹75,000 | Old: ₹50,000</p>
+          </div>
+          <div>
+            <label class="block text-lg font-medium mb-2">Deductions u/s 80C + Others (Old Regime only, ₹)</label>
+            <input type="number" id="deductionsOld" value="150000" min="0" step="1000" placeholder="e.g. 80C, 80D, HRA" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-lg font-medium mb-2">Employer NPS Contribution u/s 80CCD(2) (both regimes, % of basic)</label>
+          <input type="number" id="npsPercent" value="10" min="0" max="14" step="0.1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500" placeholder="Usually 10-14%" />
+          <p class="text-sm text-gray-500 mt-1">Assumes 50% basic salary for calculation.</p>
+        </div>
+        <button type="button" onclick="calculateTax()" class="w-full bg-green-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-green-700 transition">
+          Calculate Tax
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-green-50 border border-green-200 rounded-xl p-6">
+          <h3 class="text-2xl font-bold text-green-800 mb-4">New Regime</h3>
+          <p id="newTaxable" class="text-lg mb-2"></p>
+          <p id="newTax" class="text-2xl font-bold mb-2"></p>
+          <p id="newEffective" class="text-lg"></p>
+        </div>
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
+          <h3 class="text-2xl font-bold text-blue-800 mb-4">Old Regime</h3>
+          <p id="oldTaxable" class="text-lg mb-2"></p>
+          <p id="oldTax" class="text-2xl font-bold mb-2"></p>
+          <p id="oldEffective" class="text-lg"></p>
+        </div>
+        <div class="lg:col-span-2 bg-gray-50 border border-gray-200 rounded-xl p-6">
+          <h3 class="text-xl font-bold mb-3">Recommendation & Notes</h3>
+          <p id="comparison" class="text-lg"></p>
+          <p class="text-sm text-gray-600 mt-4 italic">
+            FY 2025-26 slabs (as per Budget 2025): New Regime – 0% ≤₹4L, 5% ₹4-8L, 10% ₹8-12L, 15% ₹12-16L, 20% ₹16-20L, 25% ₹20-24L, 30% >₹24L. Old Regime unchanged. Rebate u/s 87A applied. 4% cess included. Surcharge ignored for simplicity (applies >₹50L). For Bengaluru salaried – consult CA/IT Dept for exact (HRA, 80C, etc.). Not for business/profession income.
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function calculateTax() {
+      const gross = parseFloat(document.getElementById('grossIncome').value);
+      const deductionsOld = parseFloat(document.getElementById('deductionsOld').value) || 0;
+      const npsPercent = parseFloat(document.getElementById('npsPercent').value) / 100 || 0;
+
+      if (isNaN(gross) || gross <= 0) {
+        alert("Enter valid gross income.");
+        return;
+      }
+
+      // Assume basic salary 50% of gross for NPS 80CCD(2)
+      const basic = gross * 0.5;
+      const npsDeduct = basic * npsPercent;
+
+      // New Regime
+      let newTaxable = gross - 75000 - npsDeduct; // standard + NPS
+      newTaxable = Math.max(0, newTaxable);
+      const newTax = computeNewTax(newTaxable);
+      const newEffective = (newTax / gross * 100).toFixed(2);
+
+      // Old Regime
+      let oldTaxable = gross - 50000 - deductionsOld - npsDeduct;
+      oldTaxable = Math.max(0, oldTaxable);
+      const oldTax = computeOldTax(oldTaxable);
+      const oldEffective = (oldTax / gross * 100).toFixed(2);
+
+      // Display
+      document.getElementById('newTaxable').innerHTML = `<strong>Taxable Income:</strong> ₹${newTaxable.toLocaleString('en-IN')}`;
+      document.getElementById('newTax').innerHTML = `<strong>Tax Liability (incl. 4% cess):</strong> ₹${newTax.toLocaleString('en-IN')}`;
+      document.getElementById('newEffective').innerHTML = `<strong>Effective Rate:</strong> ${newEffective}%`;
+
+      document.getElementById('oldTaxable').innerHTML = `<strong>Taxable Income:</strong> ₹${oldTaxable.toLocaleString('en-IN')}`;
+      document.getElementById('oldTax').innerHTML = `<strong>Tax Liability (incl. 4% cess):</strong> ₹${oldTax.toLocaleString('en-IN')}`;
+      document.getElementById('oldEffective').innerHTML = `<strong>Effective Rate:</strong> ${oldEffective}%`;
+
+      let compText = newTax < oldTax 
+        ? `New Regime saves ~₹${(oldTax - newTax).toLocaleString('en-IN')}. Good if low deductions.` 
+        : `Old Regime better by ~₹${(newTax - oldTax).toLocaleString('en-IN')}. Use if high 80C/HRA deductions.`;
+      if (newTax === oldTax) compText = "Both regimes same tax liability.";
+      document.getElementById('comparison').innerHTML = `<strong>Which is better?</strong> ${compText}`;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+
+    function computeNewTax(income) {
+      if (income <= 400000) return 0;
+      let tax = 0;
+      if (income > 2400000) tax += (income - 2400000) * 0.30;
+      if (income > 2000000) tax += Math.min(income - 2000000, 400000) * 0.25;
+      if (income > 1600000) tax += Math.min(income - 1600000, 400000) * 0.20;
+      if (income > 1200000) tax += Math.min(income - 1200000, 400000) * 0.15;
+      if (income > 800000) tax += Math.min(income - 800000, 400000) * 0.10;
+      if (income > 400000) tax += Math.min(income - 400000, 400000) * 0.05;
+      tax += tax * 0.04; // cess
+      // Rebate u/s 87A if applicable (up to ~₹60k tax rebate)
+      if (tax <= 60000) tax = 0;
+      return Math.round(tax);
+    }
+
+    function computeOldTax(income) {
+      if (income <= 250000) return 0;
+      let tax = 0;
+      if (income > 1000000) tax += (income - 1000000) * 0.30;
+      if (income > 500000) tax += Math.min(income - 500000, 500000) * 0.20;
+      if (income > 250000) tax += Math.min(income - 250000, 250000) * 0.05;
+      tax += tax * 0.04; // cess
+      // Rebate u/s 87A
+      if (tax <= 12500) tax = 0;
+      return Math.round(tax);
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru March 2026</p>
+  </footer>
+</body>
+</html>
