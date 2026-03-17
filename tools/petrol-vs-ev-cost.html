@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Petrol vs EV Cost Calculator – Bengaluru 2026</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="../index.html" class="text-indigo-600 font-semibold hover:underline">← Back to CalcHub</a>
+      <h1 class="text-xl font-bold text-gray-800">Petrol vs EV Cost Calculator</h1>
+    </div>
+  </header>
+
+  <main class="flex-grow py-12 px-4">
+    <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+      <h2 class="text-3xl font-bold text-center mb-8 text-red-700">Compare Running Costs: Petrol Car vs Electric Vehicle</h2>
+      <p class="text-center text-gray-600 mb-6">See how much you save switching to EV in Bengaluru traffic! Defaults use March 2026 rates (Petrol ~₹103/L, Electricity ~₹7/unit).</p>
+      <form id="evForm" class="space-y-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Daily Commute Distance (km)</label>
+          <input type="number" id="distance" value="50" min="1" step="1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500" required />
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-lg font-medium mb-2">Petrol Car Mileage (km/L) – Real-world</label>
+            <input type="number" id="petrolMileage" value="16" min="8" step="0.1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500" required />
+          </div>
+          <div>
+            <label class="block text-lg font-medium mb-2">EV Efficiency (kWh per 100 km)</label>
+            <input type="number" id="evEfficiency" value="15" min="10" step="0.1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500" required />
+            <p class="text-sm text-gray-500 mt-1">Typical: 14–17 kWh/100 km (Tata Nexon EV, XUV400)</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-lg font-medium mb-2">Petrol Price (₹/L) – Bengaluru</label>
+            <input type="number" id="petrolPrice" value="103" min="80" step="0.01" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500" required />
+          </div>
+          <div>
+            <label class="block text-lg font-medium mb-2">Electricity Cost (₹/kWh) – Home charging</label>
+            <input type="number" id="elecPrice" value="7" min="4" step="0.1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500" required />
+          </div>
+        </div>
+        <div class="flex items-center">
+          <input type="checkbox" id="roundTrip" class="h-5 w-5 text-red-600" />
+          <label for="roundTrip" class="ml-3 text-lg">Round trip (×2 distance daily)</label>
+        </div>
+        <button type="button" onclick="calculateCosts()" class="w-full bg-red-600 text-white py-4 rounded-lg text-xl font-semibold hover:bg-red-700 transition">
+          Compare Costs
+        </button>
+      </form>
+
+      <div id="result" class="mt-10 hidden bg-red-50 border border-red-200 rounded-xl p-6">
+        <h3 class="text-2xl font-bold text-red-800 mb-4">Running Cost Comparison</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+          <div>
+            <p id="petrolCostDay" class="text-xl mb-2"></p>
+            <p id="petrolCostMonth" class="text-xl mb-2"></p>
+          </div>
+          <div>
+            <p id="evCostDay" class="text-xl mb-2"></p>
+            <p id="evCostMonth" class="text-xl mb-2"></p>
+          </div>
+        </div>
+        <p id="savingsMonth" class="text-2xl font-bold text-green-700 mb-2"></p>
+        <p id="savingsYear" class="text-xl text-green-700"></p>
+        <p class="text-sm text-gray-600 mt-4 italic">
+          Note: Running cost only (fuel/electricity). Excludes purchase price, insurance, maintenance (EVs generally lower), charging at home (public fast chargers cost more). Bengaluru March 2026 prices: Petrol ~₹103/L, BESCOM residential ~₹6–8/unit. Real savings vary with driving, traffic, AC use.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function calculateCosts() {
+      const distance = parseFloat(document.getElementById('distance').value);
+      const petrolMileage = parseFloat(document.getElementById('petrolMileage').value);
+      const evEfficiency = parseFloat(document.getElementById('evEfficiency').value) / 100; // kWh/km
+      let petrolPrice = parseFloat(document.getElementById('petrolPrice').value);
+      let elecPrice = parseFloat(document.getElementById('elecPrice').value);
+      const roundTrip = document.getElementById('roundTrip').checked;
+
+      if (isNaN(distance) || distance <= 0 || isNaN(petrolMileage) || petrolMileage <= 0 || isNaN(evEfficiency) || evEfficiency <= 0) {
+        alert("Please enter valid positive values.");
+        return;
+      }
+
+      const dailyDistance = roundTrip ? distance * 2 : distance;
+
+      // Petrol cost
+      const petrolLitres = dailyDistance / petrolMileage;
+      const petrolDaily = petrolLitres * petrolPrice;
+      const petrolMonthly = petrolDaily * 30;
+
+      // EV cost
+      const evKwh = dailyDistance * evEfficiency;
+      const evDaily = evKwh * elecPrice;
+      const evMonthly = evDaily * 30;
+
+      const savingsDaily = petrolDaily - evDaily;
+      const savingsMonthly = petrolMonthly - evMonthly;
+      const savingsYearly = savingsMonthly * 12;
+
+      document.getElementById('petrolCostDay').innerHTML = `<strong>Petrol Car Daily Cost:</strong> ₹${petrolDaily.toFixed(2)}`;
+      document.getElementById('petrolCostMonth').innerHTML = `<strong>Monthly (30 days):</strong> ₹${petrolMonthly.toFixed(0).toLocaleString('en-IN')}`;
+
+      document.getElementById('evCostDay').innerHTML = `<strong>EV Daily Cost:</strong> ₹${evDaily.toFixed(2)}`;
+      document.getElementById('evCostMonth').innerHTML = `<strong>Monthly (30 days):</strong> ₹${evMonthly.toFixed(0).toLocaleString('en-IN')}`;
+
+      document.getElementById('savingsMonth').innerHTML = `Monthly Savings with EV: ₹${savingsMonthly.toFixed(0).toLocaleString('en-IN')}`;
+      document.getElementById('savingsYear').innerHTML = `Annual Savings: ₹${savingsYearly.toFixed(0).toLocaleString('en-IN')} (approx.)`;
+
+      document.getElementById('result').classList.remove('hidden');
+    }
+  </script>
+
+  <footer class="bg-gray-900 text-white text-center py-6 mt-auto">
+    <p>CalcHub • Free Tools • Bengaluru March 2026</p>
+  </footer>
+</body>
+</html>
